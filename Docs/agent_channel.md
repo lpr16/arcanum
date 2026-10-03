@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-03 - Cursor - Phase 1
+
+Reframed the README around the elliptic-curve group, labeled the other modules and current test coverage accurately, and renamed the two overclaiming SHA-256 test facts without changing their assertions. `dotnet test --configuration Release` passed.
+
 ### 2026-10-03 - Cursor - Phase 0
 
 Added the repository ground rules, this agent mailbox, and the elliptic-curve work program. `dotnet test --configuration Release` passed.

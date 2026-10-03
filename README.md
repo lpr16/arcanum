@@ -1,126 +1,88 @@
-# Arcanum ( Geheimnis / Esoteric Knowledge )
+# Arcanum
 
-> **A Comprehensive, Mathematically-Grounded Study of Cryptography in F#**
+> A mathematically grounded study of elliptic-curve groups in F#.
 
-```text
-     /\                                            
-    /  \   _ __ ___ __ _ _ __  _   _ _ __ ___      
-   / /\ \ | '__/ __/ _` | '_ \| | | | '_ ` _ \     
-  / ____ \| | | (_| (_| | | | | |_| | | | | | |    
- /_/    \_\_|  \___\__,_|_| |_|\__,_|_| |_| |_|    
-           A Study in Cryptography with F#         
-```
+Arcanum's product is the group of points on a short Weierstrass curve over a prime field. The repository also retains cryptographic and historical demonstrations that are explicitly separate from that mathematical core.
 
-`Arcanum` is a thorough exploration and laboratory of classical, modern symmetric, asymmetric, and exploit-driven cryptography implemented in idiomatic, pure functional **F# (.NET 10)**.
+The project targets F# on .NET 10. It is an educational and research codebase, not a production cryptography library.
 
-Designed with high mathematical rigor and domain-driven type safety, `Arcanum` avoids typical C/Python memory and state pitfalls by utilizing F#'s algebraic type system, units of measure, and railway-oriented result flows.
+## Elliptic-curve group
 
----
+The group and the arithmetic it uses are implemented in:
 
-## 🏛️ Project Architecture
+- `src/Arcanum.Core/EllipticCurve.fs`: `EllipticCurve.add`, `double`, and `scalarMultiply`, with parameter records for `secp256k1` and NIST P-256.
+- `src/Arcanum.Core/Modular.fs`: `modPos`, `xgcd`, `modInverse`, `crt`, `jacobi`, and `modSqrt` are written in F#. For a non-negative exponent, `modPow` delegates to `BigInteger.ModPow`.
 
-The solution is partitioned into focused, layered modules:
+`EllipticCurve.scalarMultiply` uses double-and-add after reducing the scalar modulo `Curve.N`. The curve record documents `N` as the order of its generator `G`. The coordinates use F# `BigInteger`; this is not a constant-time field implementation.
+
+## Other modules
+
+The following code remains in the repository but is not the product:
+
+- `src/Arcanum.Hashing/SHA256.fs` calls `System.Security.Cryptography.SHA256.HashData`. This repository does not implement the SHA-256 compression function.
+- `src/Arcanum.Hashing/HMAC.fs` constructs HMAC in F# and uses `SHA256.hash` for its hash step.
+- `src/Arcanum.Hashing/PBKDF2.fs` constructs PBKDF2 in F# and uses `HMAC.hmacSha256` as its pseudorandom function.
+- `Bytes.randomBytes` and the random source in `Primes.fs` call `RandomNumberGenerator.Fill`.
+- `src/Arcanum.Core/FiniteFields.fs` contains finite-field studies.
+- `src/Arcanum.Symmetric` contains `Padding.fs`, `Aes.fs`, `Modes.fs`, `ChaCha20.fs`, `Poly1305.fs`, and `ChaCha20Poly1305.fs`.
+- `src/Arcanum.Asymmetric` contains `Rsa.fs`, `DiffieHellman.fs`, and `Ecdsa.fs`. The ECDSA message representative uses `SHA256.hash`. `Ecdsa.signWithNonce` accepts a caller-supplied nonce; that is not an implementation of RFC 6979.
+- `src/Arcanum.Classical` contains the historical mechanisms in `Substitution.fs`, `Polyalphabetic.fs`, `Playfair.fs`, `Enigma.fs`, and `Cryptanalysis.fs`.
+- `src/Arcanum.Cli/Program.fs` is a demonstration runner, including attack demonstrations.
+
+## Solution structure
 
 ```text
 arcanum/
-├── src/
-│   ├── Arcanum.Core/            # Mathematical & algebraic foundations
-│   │   ├── Types.fs             # Units of measure & single-case DUs
-│   │   ├── Bytes.fs             # Constant-time equality, bitwise logic, CSPRNG
-│   │   ├── Modular.fs           # xGCD, modInverse, CRT, modSqrt (Tonelli-Shanks)
-│   │   ├── Primes.fs            # Miller-Rabin primality, safe prime generation
-│   │   ├── FiniteFields.fs      # GF(2^8) & algebraic AES S-Box derivation, GF(2^128)
-│   │   └── EllipticCurve.fs     # Weierstrass curves: secp256k1 & NIST P-256
-│   ├── Arcanum.Classical/       # Historical ciphers & cryptanalysis
-│   │   ├── Substitution.fs      # Caesar, Atbash, Affine (coprime mod 26)
-│   │   ├── Polyalphabetic.fs    # Vigenère, Beaufort
-│   │   ├── Playfair.fs          # 5x5 matrix digraph substitution
-│   │   ├── Enigma.fs            # Authentic Wehrmacht M3 simulator (double-stepping)
-│   │   └── Cryptanalysis.fs     # Chi-squared English scoring, IoC, Caesar/Vigenère crackers
-│   ├── Arcanum.Symmetric/       # Symmetric block & stream ciphers
-│   │   ├── Padding.fs           # Constant-time PKCS#7 padding & validation
-│   │   ├── Aes.fs               # Pure AES-128 (SubBytes, MixColumns, key expansion)
-│   │   ├── Modes.fs             # ECB, CBC, and Counter (CTR) modes
-│   │   ├── ChaCha20.fs          # RFC 8439 ChaCha20 stream cipher
-│   │   ├── Poly1305.fs          # RFC 8439 one-time authenticator (mod 2^130 - 5)
-│   │   └── ChaCha20Poly1305.fs  # RFC 8439 Authenticated Encryption (AEAD)
-│   ├── Arcanum.Hashing/         # Hashing, MACs, and Key Derivation
-│   │   ├── SHA256.fs            # FIPS 180-4 SHA-256
-│   │   ├── HMAC.fs              # RFC 2104 Keyed-Hashing with constant-time verify
-│   │   └── PBKDF2.fs            # RFC 8018 password-based key derivation
-│   ├── Arcanum.Asymmetric/      # Public-key cryptosystems
-│   │   ├── DiffieHellman.fs     # RFC 3526 MODP Group 5 & ECDH (secp256k1)
-│   │   ├── Rsa.fs               # RSA keygen, textbook RSA, CRT acceleration, OAEP
-│   │   └── Ecdsa.fs             # ECDSA signature generation & verification
-│   └── Arcanum.Cli/             # Interactive demonstration runner & Exploit Lab
-│       └── Program.fs           # Real-world demos: Padding Oracle, Nonce Reuse
-└── tests/
-    └── Arcanum.Tests/           # NIST CAVP & RFC test vectors + property tests
-        └── Tests.fs
+|-- src/
+|   |-- Arcanum.Core/
+|   |-- Arcanum.Classical/
+|   |-- Arcanum.Symmetric/
+|   |-- Arcanum.Hashing/
+|   |-- Arcanum.Asymmetric/
+|   `-- Arcanum.Cli/
+`-- tests/
+    `-- Arcanum.Tests/
 ```
 
----
+F# compile items are listed explicitly in each SDK-style project file. The solution is `Arcanum.slnx`.
 
-## ⚡ Quickstart
+## Quickstart
 
-### Prerequisites
+### Prerequisite
+
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 
-### Run the Interactive Suite
-Execute the interactive CLI laboratory demonstrating all ciphers, key agreements, digital signatures, and live exploits:
+Run the interactive demonstrations:
 
 ```bash
 dotnet run --project src/Arcanum.Cli/Arcanum.Cli.fsproj
 ```
 
-### Run Automated Tests
-Execute the unit and compliance test suite (including RFC 8439, RFC 4231, and NIST test vectors):
+Run the tests:
 
 ```bash
 dotnet test
 ```
 
----
+Run the required Release configuration:
 
-## 🔬 Core Cryptographic Studies
+```bash
+dotnet test --configuration Release
+```
 
-### 1. Algebraic & Mathematical Foundations
-* **Extended Euclidean Algorithm (`xgcd`) & Modular Inverse**: Solves Bézout's identity $a \cdot x + b \cdot y = \gcd(a, b)$ and derives modular multiplicative inverses over arbitrary precision integers (`BigInteger`).
-* **Chinese Remainder Theorem (CRT)**: Solves systems of modular congruences; used for accelerating RSA private key decryption by $\sim 4\times$.
-* **Finite Fields $\mathbb{F}_{2^8}$ & The AES S-Box**: Demonstrates how the 256-byte AES S-Box is mathematically derived from the multiplicative inverse in $GF(2^8)$ followed by an affine transformation over $\mathbb{F}_2$.
-* **Elliptic Curves over Prime Fields**: Weierstrass curve model $y^2 \equiv x^3 + ax + b \pmod p$ with point addition, point doubling, and double-and-add scalar multiplication for both `secp256k1` (Bitcoin/Ethereum) and `NIST P-256`.
+## Current test coverage
 
-### 2. Classical Cryptanalysis
-* **Chi-Squared ($\chi^2$) Goodness-of-Fit**: Automated decryption of substitution ciphers by minimizing the distance against natural English letter frequencies:
-  $$\chi^2 = \sum_{i=0}^{25} \frac{(O_i - E_i)^2}{E_i}$$
-* **Index of Coincidence (IoC / Friedman Test)**: Differentiates monoalphabetic English ($IC \approx 0.0667$) from polyalphabetic or uniform random distributions ($IC \approx 0.0385$) and automatically recovers Vigenère key lengths.
-* **Wehrmacht Enigma M3 Simulation**: Accurate simulation including rotors I–V, ring settings (*Ringstellung*), turnover notches, plugboard (*Steckerbrett*), and the historical double-stepping anomaly.
+The current suite checks:
 
-### 3. Symmetric Ciphers & AEAD
-* **AES-128**: Pure functional implementation of Rijndael with key schedule expansion, SubBytes, ShiftRows, and MixColumns over $GF(2^8)$.
-* **Modes of Operation**: Constant-time PKCS#7 padded CBC mode, CTR mode, and Electronic Codebook (ECB).
-* **ChaCha20-Poly1305 AEAD (RFC 8439)**: Authenticated encryption with associated data, enforcing strict constant-time MAC verification prior to decrypting payloads.
+- Caesar, Atbash, AES-CBC, and ChaCha20-Poly1305 round trips. The ChaCha20-Poly1305 fact also rejects one tampered ciphertext; it is not an RFC 8439 vector file.
+- Enigma reciprocity.
+- The results of the CLR SHA-256 library call for `"abc"` and the empty message against their published digests. These checks do not demonstrate an in-repository SHA-256 compression function.
+- One HMAC-SHA256 case from RFC 4231.
+- Agreement between two locally generated ECDH parties; this is not a published shared-secret vector.
+- ECDSA sign-then-verify and rejection of a modified message; this is not a published signature vector.
 
-### 4. Asymmetric Cryptography
-* **Diffie-Hellman & ECDH**: RFC 3526 1536-bit MODP Group 5 and elliptic-curve key exchange over `secp256k1`.
-* **RSA (Rivest–Shamir–Adleman)**: Probabilistic prime generation, key generation ($e = 65537$), CRT-accelerated decryption, and RFC 8017 OAEP with SHA-256 and MGF1.
-* **ECDSA**: Curve-agnostic digital signatures $(r, s)$ with support for both deterministic (RFC 6979) and CSPRNG nonces.
+Round-trip checks are not NIST CAVP vectors.
 
-### 5. The Exploit & Cryptanalysis Lab
-* **Serge Vaudenay's CBC Padding Oracle Attack**: Exploits an oracle returning only whether PKCS#7 padding is valid, completely recovering the underlying secret plaintext block-by-block without ever knowing the key.
-* **ECDSA Private Key Recovery via Nonce Reuse**: Demonstrates the mathematical vulnerability (famous for the PS3 security break) where signing two distinct messages with the same nonce $k$ allows an attacker to compute:
-  $$k \equiv \frac{z_1 - z_2}{s_1 - s_2} \pmod n \implies d_A \equiv \frac{s_1 \cdot k - z_1}{r} \pmod n$$
-* **Timing Side-Channel Analysis**: Demonstrates how naive string/byte equality leaking early exits reveals secrets via timing differences, contrasted against constant-time equality primitives.
+## License
 
----
-
-## 🛡️ Functional Programming Principles in Cryptography
-
-1. **Type-Safe Domain Modeling**: Plaintexts, ciphertexts, private keys, public keys, nonces, and initialization vectors are separated by single-case discriminated unions (`Plaintext`, `Ciphertext`, `Key`, `Nonce`, `Iv`), preventing accidental argument swap bugs.
-2. **Side-Channel Mitigation**: Memory buffers with secret material support zeroization, and equality checks enforce constant-time execution (`Bytes.constantTimeEquals`).
-3. **Railway-Oriented Security**: Cryptographic failures return strongly-typed `Result<'T, CryptoError>` states, eliminating unhandled exceptions and unsafe fallback states.
-
----
-
-## 📄 License
 MIT License. Created for educational and research study in cryptography.

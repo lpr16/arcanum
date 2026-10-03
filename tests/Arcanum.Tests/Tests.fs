@@ -42,13 +42,13 @@ module Tests =
         Assert.Equal(original, decrypted)
 
     [<Fact>]
-    let ``Hashing - SHA-256 standard NIST test vector for abc`` () =
+    let ``Hashing - CLR SHA-256 call matches published digest of abc`` () =
         let digest = SHA256.hashString "abc"
         let hex = Bytes.toHex digest.Value
         Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", hex)
 
     [<Fact>]
-    let ``Hashing - SHA-256 empty string test vector`` () =
+    let ``Hashing - CLR SHA-256 call matches published digest of empty message`` () =
         let digest = SHA256.hash [||]
         let hex = Bytes.toHex digest.Value
         Assert.Equal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", hex)
