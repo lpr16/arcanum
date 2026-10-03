@@ -2,6 +2,8 @@ namespace Arcanum.Classical
 
 open System
 
+/// Historical cipher-analysis techniques for study and demonstration.
+/// This module is not Arcanum's mathematical core.
 module Cryptanalysis =
     /// Standard English letter probabilities (A to Z).
     let englishFrequencies : float[] = [|

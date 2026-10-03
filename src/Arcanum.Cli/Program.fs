@@ -9,6 +9,8 @@ open Arcanum.Symmetric
 open Arcanum.Hashing
 open Arcanum.Asymmetric
 
+/// Runs historical mechanisms, cryptographic demonstrations, and attack examples.
+/// This demonstration module is not Arcanum's mathematical core.
 module Program =
     let printHeader (title: string) =
         Console.ForegroundColor <- ConsoleColor.Cyan

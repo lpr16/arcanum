@@ -3,6 +3,8 @@ namespace Arcanum.Hashing
 open System
 open Arcanum.Core
 
+/// An F# construction of PBKDF2 whose PRF is HMAC.hmacSha256.
+/// Its underlying SHA-256 primitive is the CLR call documented by SHA256.
 module PBKDF2 =
     /// Computes PBKDF2 with HMAC-SHA256 per RFC 2898 / RFC 8018.
     let deriveKey (password: byte[]) (salt: byte[]) (iterations: int) (outputByteLength: int) : Key =

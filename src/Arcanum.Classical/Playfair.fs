@@ -3,6 +3,8 @@ namespace Arcanum.Classical
 open System
 open Arcanum.Core
 
+/// The historical Playfair mechanism for study and demonstration.
+/// This module is not Arcanum's mathematical core.
 module Playfair =
     /// Standard 5x5 key matrix structure (merging 'J' into 'I').
     type Matrix = {

@@ -2,6 +2,8 @@ namespace Arcanum.Classical
 
 open System
 
+/// A historical Enigma mechanism for study and demonstration.
+/// This module is not Arcanum's mathematical core.
 module Enigma =
     type RotorType = RotorI | RotorII | RotorIII | RotorIV | RotorV
     type ReflectorType = ReflectorB | ReflectorC

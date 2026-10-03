@@ -3,6 +3,8 @@ namespace Arcanum.Classical
 open System
 open Arcanum.Core
 
+/// Historical substitution mechanisms for study and demonstration.
+/// This module is not Arcanum's mathematical core.
 module Substitution =
     /// Normalizes a character to uppercase A-Z index [0..25].
     let private charToIndex (c: char) : int option =

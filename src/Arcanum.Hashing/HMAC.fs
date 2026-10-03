@@ -3,6 +3,8 @@ namespace Arcanum.Hashing
 open System
 open Arcanum.Core
 
+/// An F# construction of HMAC whose hash step calls SHA256.hash.
+/// The underlying SHA-256 primitive is the CLR call documented by that module.
 module HMAC =
     /// Computes HMAC-SHA256 per RFC 2104.
     let hmacSha256 (key: Key) (message: byte[]) : Tag =

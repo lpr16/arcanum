@@ -3,6 +3,8 @@ namespace Arcanum.Classical
 open System
 open Arcanum.Core
 
+/// Historical polyalphabetic mechanisms for study and demonstration.
+/// This module is not Arcanum's mathematical core.
 module Polyalphabetic =
     let private charToShift (c: char) : int option =
         if c >= 'A' && c <= 'Z' then Some (int c - int 'A')
