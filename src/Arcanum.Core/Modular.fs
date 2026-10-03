@@ -32,6 +32,7 @@ module Modular =
                 None
 
     /// Fast modular exponentiation (baseVal^exponent mod modulus).
+    /// A non-negative exponent delegates to BigInteger.ModPow.
     let modPow (baseVal: BigInteger) (exponent: BigInteger) (modulus: BigInteger) : BigInteger =
         if modulus <= BigInteger.Zero then
             raise (ArgumentOutOfRangeException(nameof modulus, "Modulus must be positive"))

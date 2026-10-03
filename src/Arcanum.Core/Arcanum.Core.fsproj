@@ -9,6 +9,7 @@
     <Compile Include="Types.fs" />
     <Compile Include="Bytes.fs" />
     <Compile Include="Modular.fs" />
+    <Compile Include="ToyField.fs" />
     <Compile Include="Primes.fs" />
     <Compile Include="FiniteFields.fs" />
     <Compile Include="EllipticCurve.fs" />
