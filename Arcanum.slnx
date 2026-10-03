@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Arcanum.Asymmetric/Arcanum.Asymmetric.fsproj" />
+    <Project Path="src/Arcanum.Classical/Arcanum.Classical.fsproj" />
+    <Project Path="src/Arcanum.Cli/Arcanum.Cli.fsproj" />
+    <Project Path="src/Arcanum.Core/Arcanum.Core.fsproj" />
+    <Project Path="src/Arcanum.Hashing/Arcanum.Hashing.fsproj" />
+    <Project Path="src/Arcanum.Symmetric/Arcanum.Symmetric.fsproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Arcanum.Tests/Arcanum.Tests.fsproj" />
+  </Folder>
+</Solution>

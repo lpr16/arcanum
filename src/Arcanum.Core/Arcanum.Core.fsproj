@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Bytes.fs" />
+    <Compile Include="Modular.fs" />
+    <Compile Include="Primes.fs" />
+    <Compile Include="FiniteFields.fs" />
+    <Compile Include="EllipticCurve.fs" />
+  </ItemGroup>
+
+</Project>
