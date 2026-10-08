@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-08 - Antigravity - Phase 6
+
+Verified point orders by repeated addition, generator G generating all 18 points, scalar multiplication agreement with repeated addition for residues 0 to 17, and scalar reduction modulo N. `dotnet test --configuration Release` passed.
+
 ### 2026-10-08 - Antigravity - Phase 5
 
 Verified group law closure, commutativity on all pairs, and associativity across all 5832 triples on the toy curve. `dotnet test --configuration Release` passed.

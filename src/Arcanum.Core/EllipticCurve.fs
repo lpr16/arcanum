@@ -89,7 +89,9 @@ module EllipticCurve =
     let double (curve: Curve) (pt: ECPoint) : ECPoint =
         add curve pt pt
 
-    /// Scalar multiplication using double-and-add algorithm: k * P
+    /// Scalar multiplication using double-and-add algorithm: k * P.
+    /// The scalar is reduced modulo Curve.N, and for toy, secp256k1, and nistP256 that N is the order of G.
+    /// On toy this is the order of the whole group, so k * Q and (k mod N) * Q are the same point for every Q on the curve.
     let scalarMultiply (curve: Curve) (kVal: BigInteger) (pt: ECPoint) : ECPoint =
         let k = Modular.modPos kVal curve.N
         if k = BigInteger.Zero || pt = Infinity then
