@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-08 - Antigravity - Phase 8
+
+Updated README to document the exact coordinate field, toy curve group, large curve checks, and executed work program. `dotnet test --configuration Release` passed.
+
 ### 2026-10-08 - Antigravity - Phase 7
 
 Verified secp256k1 and NIST P-256 generators lie on curve, with unreduced double-and-add order checks confirming N * G = Infinity and (N - 1) * G = -G without discrete log or modular reduction. `dotnet test --configuration Release` passed.
