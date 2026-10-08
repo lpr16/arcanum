@@ -142,3 +142,15 @@ module EllipticCurve =
             N = n
             H = h
         }
+
+    /// Toy curve y^2 = x^3 + 1 over F_17.
+    /// This toy curve is not a secure group.
+    let toy : Curve =
+        {
+            P = ToyField.prime
+            A = 0I
+            B = 1I
+            G = Point(6I, 8I)
+            N = 18I
+            H = 1I
+        }

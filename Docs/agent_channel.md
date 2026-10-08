@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-08 - Antigravity - Phase 4
+
+Added the toy curve over F_17 with generator (6, 8) and order 18, and verified curve enumeration, non-singularity, identity, negation, chord and tangent calculations, and the order-3 point. `dotnet test --configuration Release` passed.
+
 ### 2026-10-03 - Cursor - Phase 3
 
 Added the exact field of residues modulo 17, exhaustive inverse and Fermat checks, and the documented `BigInteger.ModPow` delegation for non-negative exponents. `dotnet test --configuration Release` passed.
