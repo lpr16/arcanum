@@ -10,6 +10,7 @@
     <Compile Include="ToyFieldTests.fs" />
     <Compile Include="ToyCurveTests.fs" />
     <Compile Include="ScalarTests.fs" />
+    <Compile Include="Secp256k1Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
