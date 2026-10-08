@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-08 - Antigravity - Phase 5
+
+Verified group law closure, commutativity on all pairs, and associativity across all 5832 triples on the toy curve. `dotnet test --configuration Release` passed.
+
 ### 2026-10-08 - Antigravity - Phase 4
 
 Added the toy curve over F_17 with generator (6, 8) and order 18, and verified curve enumeration, non-singularity, identity, negation, chord and tangent calculations, and the order-3 point. `dotnet test --configuration Release` passed.

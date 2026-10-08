@@ -77,3 +77,21 @@ module ToyCurveTests =
     let ``Standard curve parameters remain intact`` () =
         Assert.Equal(BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", Globalization.NumberStyles.HexNumber), secp256k1.P)
         Assert.Equal(BigInteger.Parse("0FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF", Globalization.NumberStyles.HexNumber), nistP256.P)
+
+    [<Fact>]
+    let ``Group law closure and commutativity on all pairs`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                let sumQR = add toy q r
+                let sumRQ = add toy r q
+                Assert.Contains(sumQR, enumeratedPoints)
+                Assert.Equal(sumQR, sumRQ)
+
+    [<Fact>]
+    let ``Group law associativity on all 5832 triples`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                for s in enumeratedPoints do
+                    let left = add toy (add toy q r) s
+                    let right = add toy q (add toy r s)
+                    Assert.Equal(left, right)
