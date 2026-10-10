@@ -20,6 +20,7 @@
     <Compile Include="Poly1305Tests.fs" />
     <Compile Include="Pbkdf2Tests.fs" />
     <Compile Include="RsaTests.fs" />
+    <Compile Include="DhTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
