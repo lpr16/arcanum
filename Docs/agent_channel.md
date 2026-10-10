@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 16
+
+Verified AES-128 block encryption and decryption against FIPS 197 Appendix C.1 test vector. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 15
 
 Locked AES S-box and inverse S-box entries 0x63 and 0x7c against FIPS 197. `dotnet test --configuration Release` passed.
