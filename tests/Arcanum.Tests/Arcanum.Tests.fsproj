@@ -21,6 +21,7 @@
     <Compile Include="Pbkdf2Tests.fs" />
     <Compile Include="RsaTests.fs" />
     <Compile Include="DhTests.fs" />
+    <Compile Include="ToyEcdhTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

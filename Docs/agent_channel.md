@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 25
+
+Verified ECDH shared point equality, scalar multiplication, and repeated addition on toy curve. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 24
 
 Verified toy Diffie-Hellman exponentiations and shared secret symmetry on modulus 23. `dotnet test --configuration Release` passed.
