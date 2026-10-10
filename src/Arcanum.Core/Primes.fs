@@ -23,7 +23,7 @@ module Primes =
             elif isDivisible then Some false
             else None
 
-    /// Generates a random BigInteger in the range [min, max].
+    /// Generates a random BigInteger in the range [min, max] using the CLR RandomNumberGenerator.Fill.
     let randomBigInteger (minVal: BigInteger) (maxVal: BigInteger) : BigInteger =
         if minVal >= maxVal then
             raise (ArgumentException("minVal must be strictly less than maxVal"))
@@ -42,7 +42,7 @@ module Primes =
         loop ()
 
     /// Miller-Rabin probabilistic primality test with specified number of rounds.
-    /// The probability of a composite passing k independent rounds is at most 4^(-k).
+    /// Draws random bases using RandomNumberGenerator.Fill. This is a probabilistic test, not a deterministic primality proof.
     let isProbablePrime (n: BigInteger) (rounds: int) : bool =
         match trialDivision n with
         | Some result -> result
