@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 18
+
+Verified ChaCha20 block function against RFC 8439 section 2.3.2 test vector. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 17
 
 Locked PKCS#7 padding byte patterns, full-block expansion, and unpadding error handling. `dotnet test --configuration Release` passed.
