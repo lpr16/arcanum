@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 17
+
+Locked PKCS#7 padding byte patterns, full-block expansion, and unpadding error handling. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 16
 
 Verified AES-128 block encryption and decryption against FIPS 197 Appendix C.1 test vector. `dotnet test --configuration Release` passed.

@@ -15,6 +15,7 @@
     <Compile Include="PrimeTests.fs" />
     <Compile Include="Gf256Tests.fs" />
     <Compile Include="AesBlockTests.fs" />
+    <Compile Include="PaddingTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
