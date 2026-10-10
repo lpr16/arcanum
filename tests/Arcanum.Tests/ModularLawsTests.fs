@@ -24,3 +24,19 @@ module ModularLawsTests =
         Assert.Equal(1I, x3)
         Assert.Equal(0I, y3)
         Assert.Equal(17I, 17I * x3 + 0I * y3)
+
+    [<Fact>]
+    let ``Chinese remainder theorem solves simultaneous congruences and rejects non-coprime moduli`` () =
+        let congruences = [ (2I, 3I); (3I, 5I); (2I, 7I) ]
+        let result = Modular.crt congruences
+        Assert.Equal(Some 23I, result)
+
+        match result with
+        | Some x ->
+            for (a, m) in congruences do
+                Assert.Equal(a, Modular.modPos x m)
+        | None -> Assert.Fail("Expected CRT solution")
+
+        // Inconsistent/non-coprime even moduli return None
+        let nonCoprime = [ (1I, 2I); (0I, 4I) ]
+        Assert.Equal(None, Modular.crt nonCoprime)
