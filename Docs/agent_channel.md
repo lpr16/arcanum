@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 22
+
+Verified textbook RSA encryption, decryption via modular exponentiation, and message bounds on small key. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 21
 
 Verified single-iteration PBKDF2-HMAC-SHA256 against published test vector. `dotnet test --configuration Release` passed.
