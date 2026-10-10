@@ -18,6 +18,7 @@
     <Compile Include="PaddingTests.fs" />
     <Compile Include="ChaChaTests.fs" />
     <Compile Include="Poly1305Tests.fs" />
+    <Compile Include="Pbkdf2Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>

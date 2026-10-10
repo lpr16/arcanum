@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 21
+
+Verified single-iteration PBKDF2-HMAC-SHA256 against published test vector. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 20
 
 Added HMAC-SHA256 RFC 4231 test case 2. `dotnet test --configuration Release` passed.
