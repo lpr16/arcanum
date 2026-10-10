@@ -1,5 +1,7 @@
 # Antigravity work program
 
+This program ended at phase 8, commit `a51c83f`. Do not redo it. The next program is `Docs/antigravity_research_program.md`, phases 9 through 48.
+
 Leon asked for this on 3 Oct 2026, then asked that the program focus on elliptic curves. Execute the phases in order. One phase is one commit on `main`, pushed to `origin/main`, plus a new entry at the top of `Docs/agent_channel.md`. Then start the next phase. Cursor is not doing this run. Cursor wrote this plan. Antigravity executes it.
 
 This file is a work order for the public repository `lpr16/arcanum`. If it disagrees with `AGENTS.md` or the code, `AGENTS.md` and the code win. Code wins over both.
