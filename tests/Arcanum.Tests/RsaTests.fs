@@ -29,3 +29,21 @@ module RsaTests =
         Assert.Throws<ArgumentOutOfRangeException>(fun () ->
             Rsa.encryptRaw smallPubKey 3234I |> ignore
         ) |> ignore
+
+    let smallPrivKey: Rsa.RsaPrivateKey = {
+        N = 3233I
+        E = 17I
+        D = 2753I
+        P = 61I
+        Q = 53I
+        Dp = 53I
+        Dq = 49I
+        QInv = 38I
+    }
+
+    [<Fact>]
+    let ``Phase 23 - RSA decryption by the Chinese Remainder Theorem`` () =
+        let decryptedCrt = Rsa.decryptCrt smallPrivKey 2790I
+        Assert.Equal(65I, decryptedCrt)
+        Assert.Equal(Modular.modPow 2790I 2753I 3233I, decryptedCrt)
+
