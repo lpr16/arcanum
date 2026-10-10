@@ -64,6 +64,16 @@ module Tests =
         Assert.Equal("b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7", hex)
 
     [<Fact>]
+    let ``Hashing - HMAC-SHA256 RFC 4231 Test Case 2`` () =
+        // RFC 4231 Test Case 2
+        // Key: "Jefe", Data: "what do ya want for nothing?"
+        let key = Key (Encoding.ASCII.GetBytes "Jefe")
+        let data = Encoding.ASCII.GetBytes "what do ya want for nothing?"
+        let tag = HMAC.hmacSha256 key data
+        let hex = Bytes.toHex tag.Value
+        Assert.Equal("5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843", hex)
+
+    [<Fact>]
     let ``Symmetric - AES-128 CBC encrypt and decrypt roundtrip`` () =
         let key = Key (Bytes.randomBytes 16)
         let iv = Iv (Bytes.randomBytes 16)
