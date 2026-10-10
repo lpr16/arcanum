@@ -19,3 +19,12 @@ module Gf256Tests =
         // Non-zero element inverses
         Assert.Equal(0x01uy, GF256.multiply (GF256.inverse 0x02uy) 0x02uy)
         Assert.Equal(0x01uy, GF256.multiply (GF256.inverse 0x53uy) 0x53uy)
+
+    [<Fact>]
+    let ``AES S-box and inverse S-box values match FIPS 197 entries`` () =
+        Assert.Equal(0x63uy, GF256.sboxSub 0x00uy)
+        Assert.Equal(0x7cuy, GF256.sboxSub 0x01uy)
+
+        let invSBox = GF256.generateAesInvSBox ()
+        Assert.Equal(0x00uy, invSBox.[0x63])
+        Assert.Equal(0x01uy, invSBox.[0x7c])
