@@ -40,3 +40,17 @@ module ModularLawsTests =
         // Inconsistent/non-coprime even moduli return None
         let nonCoprime = [ (1I, 2I); (0I, 4I) ]
         Assert.Equal(None, Modular.crt nonCoprime)
+
+    [<Fact>]
+    let ``Jacobi symbol and modular square roots on toy prime 17`` () =
+        Assert.Equal(1, Modular.jacobi 2I 17I)
+        Assert.Equal(-1, Modular.jacobi 3I 17I)
+
+        match Modular.modSqrt 2I 17I with
+        | Some r ->
+            Assert.True(r >= 0I && r < 17I)
+            Assert.Equal(2I, Modular.modPos (r * r) 17I)
+        | None -> Assert.Fail("Expected modular square root for 2 mod 17")
+
+        Assert.Equal(None, Modular.modSqrt 3I 17I)
+        Assert.Equal(Some 0I, Modular.modSqrt 0I 17I)

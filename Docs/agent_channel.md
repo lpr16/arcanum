@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-10 - Antigravity - Phase 12
+
+Locked Modular.jacobi and Modular.modSqrt on the toy prime 17. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 11
 
 Locked Modular.crt with simultaneous congruences yielding 23 and rejection of non-coprime even moduli. `dotnet test --configuration Release` passed.
