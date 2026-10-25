@@ -21,3 +21,10 @@ module ClassicalLawsTests =
         // 2 is not coprime to 26
         Assert.True(Result.isError (Substitution.affineEncrypt 2 1 "A"))
 
+    [<Fact>]
+    let ``Phase 30 - Vigenere tableau encryption, decryption, and non-alphabetic key rejection`` () =
+        Assert.Equal(Ok "RIJVS", Polyalphabetic.vigenereEncrypt "KEY" "HELLO")
+        Assert.Equal(Ok "HELLO", Polyalphabetic.vigenereDecrypt "KEY" "RIJVS")
+        Assert.True(Result.isError (Polyalphabetic.vigenereEncrypt "123" "HELLO"))
+
+
