@@ -23,6 +23,7 @@
     <Compile Include="DhTests.fs" />
     <Compile Include="ToyEcdhTests.fs" />
     <Compile Include="ToyEcdsaTests.fs" />
+    <Compile Include="ClassicalLawsTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

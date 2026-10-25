@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-25 - Antigravity - Phase 28
+
+Locked Caesar and Atbash single-letter and word hand checks in ClassicalLawsTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-10-25 - Antigravity - Phase 27
 
 Verified private scalar recovery on the 18-point toy curve from two ECDSA signatures sharing nonce 7. `dotnet test --configuration Release` passed.
