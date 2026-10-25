@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-25 - Antigravity - Phase 26
+
+Verified ECDSA signWithNonce and verify on the toy curve with repeated-addition point checks and CLR SHA-256 representative, including non-unit S verification modulo composite N = 18. `dotnet test --configuration Release` passed.
+
 ### 2026-10-10 - Antigravity - Phase 25
 
 Verified ECDH shared point equality, scalar multiplication, and repeated addition on toy curve. `dotnet test --configuration Release` passed.

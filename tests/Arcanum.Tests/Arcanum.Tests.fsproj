@@ -22,6 +22,7 @@
     <Compile Include="RsaTests.fs" />
     <Compile Include="DhTests.fs" />
     <Compile Include="ToyEcdhTests.fs" />
+    <Compile Include="ToyEcdsaTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
