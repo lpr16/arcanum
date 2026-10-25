@@ -62,3 +62,57 @@ module ToyEcdsaTests =
 
             Assert.True(Ecdsa.verify curve pubPoint msgEc signature)
             Assert.False(Ecdsa.verify curve pubPoint msgEx signature)
+
+    // The toy curve group has 18 points and is not a place to keep a key.
+    [<Fact>]
+    let ``Phase 27 - Repeated nonce on toy curve exposes the private scalar`` () =
+        let curve = EllipticCurve.toy
+        let d = 5I
+        let k = 7I
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let msgEx = Encoding.ASCII.GetBytes("ex")
+
+        let pubPoint = repeatedAdd curve 5 curve.G
+        let keyPair: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = d
+            PublicKey = pubPoint
+            Curve = curve
+        }
+
+        match Ecdsa.signWithNonce keyPair msgEc k, Ecdsa.signWithNonce keyPair msgEx k with
+        | Ok sig1, Ok sig2 ->
+            Assert.Equal(sig1.R, sig2.R)
+            let r = sig1.R
+            let z1 = messageRepresentative curve msgEc
+            let z2 = messageRepresentative curve msgEx
+            let deltaS = Modular.modPos (sig1.S - sig2.S) curve.N
+            let deltaZ = Modular.modPos (z1 - z2) curve.N
+
+            let recoveredScalars =
+                [ 1I .. curve.N - 1I ]
+                |> List.choose (fun kCand ->
+                    match Modular.modInverse kCand curve.N with
+                    | None -> None
+                    | Some kInv ->
+                        let matchesLinear =
+                            Modular.modPos (deltaS * kCand) curve.N = deltaZ
+                        let matchesR =
+                            match repeatedAdd curve (int kCand) curve.G with
+                            | EllipticCurve.Point(x, _) -> Modular.modPos x curve.N = r
+                            | EllipticCurve.Infinity -> false
+                        if matchesLinear && matchesR then
+                            [ 1I .. curve.N - 1I ]
+                            |> List.filter (fun dCand ->
+                                Modular.modInverse dCand curve.N |> Option.isSome
+                                && Modular.modPos (kInv * (z1 + r * dCand)) curve.N = sig1.S
+                                && Modular.modPos (kInv * (z2 + r * dCand)) curve.N = sig2.S)
+                            |> Some
+                        else
+                            None)
+                |> List.concat
+
+            let recoveredD = Assert.Single(recoveredScalars)
+            Assert.Equal(5I, recoveredD)
+        | _ ->
+            Assert.Fail("Expected both signatures with nonce 7 to succeed")
+

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-25 - Antigravity - Phase 27
+
+Verified private scalar recovery on the 18-point toy curve from two ECDSA signatures sharing nonce 7. `dotnet test --configuration Release` passed.
+
 ### 2026-10-25 - Antigravity - Phase 26
 
 Verified ECDSA signWithNonce and verify on the toy curve with repeated-addition point checks and CLR SHA-256 representative, including non-unit S verification modulo composite N = 18. `dotnet test --configuration Release` passed.
