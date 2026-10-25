@@ -11,3 +11,13 @@ module ClassicalLawsTests =
         Assert.Equal("URYYB", Substitution.caesarEncrypt 13 "HELLO")
         Assert.Equal("Z", Substitution.atbash "A")
         Assert.Equal("A", Substitution.atbash "Z")
+
+    [<Fact>]
+    let ``Phase 29 - Affine cipher encryption, decryption, and non-coprime rejection`` () =
+        // (5 * 0 + 8) mod 26 = 8 -> 'I'
+        Assert.Equal(Ok "I", Substitution.affineEncrypt 5 8 "A")
+        Assert.Equal(Ok "A", Substitution.affineDecrypt 5 8 "I")
+
+        // 2 is not coprime to 26
+        Assert.True(Result.isError (Substitution.affineEncrypt 2 1 "A"))
+
