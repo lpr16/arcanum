@@ -4,6 +4,7 @@ open System
 open System.Numerics
 open Xunit
 open Arcanum.Core
+open Arcanum.Hashing
 open Arcanum.Asymmetric
 
 module RsaTests =
@@ -46,4 +47,15 @@ module RsaTests =
         let decryptedCrt = Rsa.decryptCrt smallPrivKey 2790I
         Assert.Equal(65I, decryptedCrt)
         Assert.Equal(Modular.modPow 2790I 2753I 3233I, decryptedCrt)
+
+    [<Fact>]
+    let ``Phase 47 - MGF1 of an empty seed is one counter block`` () =
+        // Length 32 is one counter block: the counter is the big-endian integer 0 in four bytes.
+        // The expected mask is built with SHA256.hash, which is the CLR library call
+        // System.Security.Cryptography.SHA256.HashData. This is not a claim that this repository implements SHA-256.
+        let expected = (SHA256.hash [| 0x00uy; 0x00uy; 0x00uy; 0x00uy |]).Value
+        Assert.Equal<byte>(expected, Rsa.mgf1 [||] 32)
+
+        // The current function returns an empty mask for length 0.
+        Assert.Empty(Rsa.mgf1 [||] 0)
 

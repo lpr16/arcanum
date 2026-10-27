@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 47
+
+Locked `Rsa.mgf1` of an empty seed at length 32 as `SHA256.hash` of the four-byte big-endian counter 0. The expected value is the CLR library call, labeled as such. Length 0 returns an empty mask, which is what the current function does. `encryptOaep` is not called. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 46
 
 Locked the shape of `DiffieHellman.rfc3526Group5`: G is 2, P is odd, its hex begins FFFFFFFFFFFFFFFFC90FDAA2 and ends FFFFFFFFFFFFFFFF, and P is greater than 2^1535. The law failed on the old record, which held the 1024-bit RFC 2409 Oakley Group 2 prime under the RFC 3526 name. Fixed by replacing the hex with the value printed in RFC 3526 section 2. That value was also checked outside the repository against the RFC formula 2^1536 - 2^1472 - 1 + 2^64 * ([2^1406 pi] + 741804), with pi computed by Machin's formula. The law was not changed. `dotnet test --configuration Release` passed.
