@@ -13,6 +13,7 @@
     <Compile Include="Primes.fs" />
     <Compile Include="FiniteFields.fs" />
     <Compile Include="EllipticCurve.fs" />
+    <Compile Include="Lattice.fs" />
   </ItemGroup>
 
 </Project>
