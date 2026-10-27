@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 35
+
+Verified on toy that scalarMultiply k distributes over add for every residue k in 0 .. 17 and every pair, and that (k + m) Q equals kQ + mQ for k and m in 0 .. 17 on every point, where reduction modulo N is part of the law. No sampling. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 34
 
 Verified on all 324 ordered pairs of the 18 toy points that negate (Q + R) equals (-Q) + (-R), and that negation is an involution. `dotnet test --configuration Release` passed.
