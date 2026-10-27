@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 40
+
+Verified on every toy2 point that scalarMultiply k agrees with repeated addition for k in 0 .. 3, and that 4Q is Infinity by repeated addition, so reduction modulo N = 4 is sound. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 39
 
 Verified closure and commutativity on all 256 pairs and associativity on all 4096 triples of the 16 toy2 points. `add` was not changed. `dotnet test --configuration Release` passed.

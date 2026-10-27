@@ -72,3 +72,13 @@ module Toy2Tests =
             for r in enumeratedPoints do
                 for s in enumeratedPoints do
                     Assert.Equal(add toy2 (add toy2 q r) s, add toy2 q (add toy2 r s))
+
+    [<Fact>]
+    let ``Phase 40 - Scalar multiplication on toy2 agrees with repeated addition for residues 0 to 3`` () =
+        // scalarMultiply reduces modulo toy2.N = 4. That reduction matches repeated addition on every point
+        // because every point order divides 4, which repeated addition shows here.
+        // scalarMultiply toy2 4 Q is Infinity before any addition; that call is not the order proof.
+        for q in enumeratedPoints do
+            Assert.Equal(Infinity, repeatedAdd q 4)
+            for k in 0 .. 3 do
+                Assert.Equal(repeatedAdd q k, scalarMultiply toy2 (bigint k) q)
