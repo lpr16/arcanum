@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 43
+
+Added `Shamir.fs`: threshold-2 sharing over ToyField with polynomial secret + coefficient * x and Lagrange reconstruction through `ToyField.inverse`. Locked secret 5 and coefficient 3 giving shares 8, 11, and 14 at x = 1, 2, 3, every pair reconstructing 5, and refusal of a share at 0 and of two shares at the same x. No float. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 42
 
 Locked structural checks of `FiniteFields.GF128.multiply`: the zero block absorbs on both sides, the 0x80 and 0x02 blocks commute (and 0x80 acts as 1 in SP 800-38D bit order), and blocks that are not 16 bytes are rejected. Not a GHASH CAVP vector. No AES-GCM. `dotnet test --configuration Release` passed.

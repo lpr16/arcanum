@@ -28,6 +28,7 @@
     <Compile Include="ToyHomomorphismTests.fs" />
     <Compile Include="Toy2Tests.fs" />
     <Compile Include="Gf128Tests.fs" />
+    <Compile Include="ShamirTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
