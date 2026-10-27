@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 48
+
+Updated README to describe the research study and its center, toy and toy2, jInvariant, compress and decompress, Lattice, Shamir, the CLR boundary, the cited single vectors, and the classical modules and CLI as historical mechanisms and demonstrations. The quickstart commands are unchanged. Confirmed the channel has one entry for each phase from 9 through 48, the phase 0 through 8 entries are present and unedited, and there is no phase 2 line. Two notes for the work order: phases 37 and 38 follow the code's standard j-invariant (toy2 is Some 11, not Some 6), and the PBKDF2 test comment cites RFC 6070 and RFC 7914, neither of which contains its password/salt SHA-256 answer. The README does not repeat that citation. `dotnet test --configuration Release` passed. The research program is complete.
+
 ### 2026-10-27 - Claude Code - Phase 47
 
 Locked `Rsa.mgf1` of an empty seed at length 32 as `SHA256.hash` of the four-byte big-endian counter 0. The expected value is the CLR library call, labeled as such. Length 0 returns an empty mask, which is what the current function does. `encryptOaep` is not called. `dotnet test --configuration Release` passed.
