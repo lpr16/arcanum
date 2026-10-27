@@ -25,6 +25,7 @@
     <Compile Include="ToyEcdsaTests.fs" />
     <Compile Include="ClassicalLawsTests.fs" />
     <Compile Include="LatticeTests.fs" />
+    <Compile Include="ToyHomomorphismTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

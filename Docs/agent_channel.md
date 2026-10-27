@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 34
+
+Verified on all 324 ordered pairs of the 18 toy points that negate (Q + R) equals (-Q) + (-R), and that negation is an involution. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 33
 
 Added `Lattice.fs` with the integer basis rows (2, 1) and (1, 2), its determinant 3, and its Gram matrix [[5; 4]; [4; 5]]. No sampler, no encryption, no LLL, and no reference to `EllipticCurve`. `dotnet test --configuration Release` passed.
