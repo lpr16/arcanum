@@ -170,3 +170,16 @@ module EllipticCurve =
             N = 18I
             H = 1I
         }
+
+    /// Second toy curve y^2 = x^3 + x over F_17, with 16 points.
+    /// The group is not cyclic and G does not generate it: G = (1, 6) has order 4, and N = 4 is the order of G.
+    /// This toy curve is not a secure group.
+    let toy2 : Curve =
+        {
+            P = ToyField.prime
+            A = 1I
+            B = 0I
+            G = Point(1I, 6I)
+            N = 4I
+            H = 4I
+        }

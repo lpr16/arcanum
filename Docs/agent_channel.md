@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 38
+
+Added `EllipticCurve.toy2`, y^2 = x^3 + x over F_17 with G = (1, 6), N = 4, H = 4, documented as non-cyclic and not a secure group. Locked 16 enumerated points, G of order 4, (0, 0) of order 2, a 4-point subgroup of G, and (1, 6) + (6, 1) = (11, 4). Deviation from the work order: it expects `jInvariant toy2 = Some 6`, which is the value of its sign-dropped formula. The locked law is `Some 11`, because y^2 = x^3 + x has j = 1728 and 1728 = 11 mod 17. The test shows the hand computation. `toy` is unchanged. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 37
 
 Added `EllipticCurve.jInvariant` and locked `jInvariant toy = Some 0` and `None` for A = 0, B = 0, P = 17. Deviation from the work order: its formula `1728 * (4a)^3 * inverse(Delta)` omits a minus sign. The standard value is `-1728 * (4a)^3 / Delta`, which is c4^3 / Delta with c4 = -48a (Silverman III.1), and the code uses it. Both give 0 on toy. They differ on toy2 in phase 38, where y^2 = x^3 + x has j = 1728 = 11 mod 17, not 6. `dotnet test --configuration Release` passed.
