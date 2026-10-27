@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 32
+
+Locked index of coincidence as exact fractions on AAAA, ABCD, and A, and breakCaesar recovery of shift 3 on the pangram. The chi-squared score is not locked. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 31
 
 Locked the Playfair square for key MONARCHY: row 0 is M O N A R, and the same-row pair MO encrypts to ON and decrypts back. Claude Code is executing phases 31 through 48 at Leon's request. `dotnet test --configuration Release` passed.

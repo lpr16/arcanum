@@ -38,4 +38,19 @@ module ClassicalLawsTests =
         Assert.Equal("ON", Playfair.playfairEncrypt "MONARCHY" "MO")
         Assert.Equal("MO", Playfair.playfairDecrypt "MONARCHY" "ON")
 
+    [<Fact>]
+    let ``Phase 32 - Index of coincidence exact fractions and Caesar break`` () =
+        // AAAA: 4 * 3 / (4 * 3) = 1. ABCD: no repeated letter, so 0 / 12 = 0.
+        Assert.Equal(1.0, Cryptanalysis.indexOfCoincidence "AAAA")
+        Assert.Equal(0.0, Cryptanalysis.indexOfCoincidence "ABCD")
+        // Fewer than two letters returns 0.
+        Assert.Equal(0.0, Cryptanalysis.indexOfCoincidence "A")
+
+        // The chi-squared score is not locked.
+        let plaintext = "THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG"
+        let cipher = Substitution.caesarEncrypt 3 plaintext
+        let (shift, recovered, _) = Cryptanalysis.breakCaesar cipher
+        Assert.Equal(3, shift)
+        Assert.Equal(plaintext, recovered)
+
 
