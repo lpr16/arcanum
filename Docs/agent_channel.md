@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 42
+
+Locked structural checks of `FiniteFields.GF128.multiply`: the zero block absorbs on both sides, the 0x80 and 0x02 blocks commute (and 0x80 acts as 1 in SP 800-38D bit order), and blocks that are not 16 bytes are rejected. Not a GHASH CAVP vector. No AES-GCM. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 41
 
 Added `EllipticCurve.compress` and `decompress` with `Modular.modSqrt`. Locked on toy: (6, 8) compresses to x = 6 with bit 0 and decompresses back, bit 1 at x = 6 gives (6, 9), Infinity round-trips, and x = 3 returns None. `decompress` also returns None when no root has the recorded bit. `dotnet test --configuration Release` passed.
