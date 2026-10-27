@@ -27,4 +27,15 @@ module ClassicalLawsTests =
         Assert.Equal(Ok "HELLO", Polyalphabetic.vigenereDecrypt "KEY" "RIJVS")
         Assert.True(Result.isError (Polyalphabetic.vigenereEncrypt "123" "HELLO"))
 
+    [<Fact>]
+    let ``Phase 31 - Playfair square for MONARCHY and same-row pair`` () =
+        // The square merges J into I.
+        let matrix = Playfair.createMatrix "MONARCHY"
+        let row0 = [| for col in 0 .. 4 -> matrix.Grid.[0, col] |]
+        Assert.Equal<char>([| 'M'; 'O'; 'N'; 'A'; 'R' |], row0)
+
+        // M and O share row 0, so each letter steps one column right.
+        Assert.Equal("ON", Playfair.playfairEncrypt "MONARCHY" "MO")
+        Assert.Equal("MO", Playfair.playfairDecrypt "MONARCHY" "ON")
+
 
