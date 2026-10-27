@@ -82,6 +82,21 @@ module ToyCurveTests =
         Assert.Equal(None, jInvariant { toy with A = 0I; B = 0I })
 
     [<Fact>]
+    let ``Phase 41 - Point compression and decompression on toy`` () =
+        // 8 is even, so the least bit of y is 0.
+        let compressed = compress toy (Point(6I, 8I))
+        Assert.Equal(Compressed(6I, 0), compressed)
+        Assert.Equal(Some (Point(6I, 8I)), decompress toy compressed)
+
+        // The other bit at x = 6 is the other root, 9 = -8 (mod 17).
+        Assert.Equal(Some (Point(6I, 9I)), decompress toy (Compressed(6I, 1)))
+
+        Assert.Equal(Some Infinity, decompress toy (compress toy Infinity))
+
+        // 3^3 + 1 = 28 = 11 (mod 17), and 11 is not a square modulo 17.
+        Assert.Equal(None, decompress toy (Compressed(3I, 0)))
+
+    [<Fact>]
     let ``Standard curve parameters remain intact`` () =
         Assert.Equal(BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", Globalization.NumberStyles.HexNumber), secp256k1.P)
         Assert.Equal(BigInteger.Parse("0FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF", Globalization.NumberStyles.HexNumber), nistP256.P)

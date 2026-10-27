@@ -33,6 +33,11 @@ module EllipticCurve =
         H: BigInteger  // Cofactor
     }
 
+    /// A compressed point: Infinity, or the x coordinate and the least bit of y in 0 .. P - 1.
+    type CompressedPoint =
+        | CompressedInfinity
+        | Compressed of x: BigInteger * yBit: int
+
     /// Verifies if a point lies on the elliptic curve.
     let isOnCurve (curve: Curve) (pt: ECPoint) : bool =
         match pt with
@@ -122,6 +127,24 @@ module EllipticCurve =
                 scalar <- scalar >>> 1
 
             res
+
+    /// Compresses a point to its x coordinate and the least bit of y in 0 .. P - 1.
+    let compress (curve: Curve) (pt: ECPoint) : CompressedPoint =
+        match pt with
+        | Infinity -> CompressedInfinity
+        | Point(x, y) -> Compressed(x, int (Modular.modPos y curve.P &&& BigInteger.One))
+
+    /// Recovers a point from its compressed form with Modular.modSqrt of x^3 + a*x + b.
+    /// Returns None when that square root is missing or when no root has the recorded least bit.
+    let decompress (curve: Curve) (compressed: CompressedPoint) : ECPoint option =
+        match compressed with
+        | CompressedInfinity -> Some Infinity
+        | Compressed(x, yBit) ->
+            let rhs = Modular.modPos (Modular.modPow x 3I curve.P + curve.A * x + curve.B) curve.P
+            Modular.modSqrt rhs curve.P
+            |> Option.bind (fun root ->
+                let y = if int (root &&& BigInteger.One) = yBit then root else Modular.modPos (-root) curve.P
+                if int (y &&& BigInteger.One) = yBit then Some (Point(x, y)) else None)
 
     /// Standard curve parameters for secp256k1 (Bitcoin, Ethereum).
     let secp256k1 : Curve =

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 41
+
+Added `EllipticCurve.compress` and `decompress` with `Modular.modSqrt`. Locked on toy: (6, 8) compresses to x = 6 with bit 0 and decompresses back, bit 1 at x = 6 gives (6, 9), Infinity round-trips, and x = 3 returns None. `decompress` also returns None when no root has the recorded bit. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 40
 
 Verified on every toy2 point that scalarMultiply k agrees with repeated addition for k in 0 .. 3, and that 4Q is Infinity by repeated addition, so reduction modulo N = 4 is sound. `dotnet test --configuration Release` passed.
