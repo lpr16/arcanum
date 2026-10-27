@@ -57,3 +57,18 @@ module Toy2Tests =
         // By hand: Delta = -16 * 4 = 4, (4a)^3 = 64 = 13, 4^(-1) = 13, -1728 = 6 (mod 17),
         // so j = 6 * 13 * 13 = 11 (mod 17).
         Assert.Equal(Some 11I, jInvariant toy2)
+
+    [<Fact>]
+    let ``Phase 39 - Group law closure and commutativity on all pairs of toy2`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                let sumQR = add toy2 q r
+                Assert.Contains(sumQR, enumeratedPoints)
+                Assert.Equal(sumQR, add toy2 r q)
+
+    [<Fact>]
+    let ``Phase 39 - Group law associativity on all 4096 triples of toy2`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                for s in enumeratedPoints do
+                    Assert.Equal(add toy2 (add toy2 q r) s, add toy2 q (add toy2 r s))

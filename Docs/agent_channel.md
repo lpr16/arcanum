@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 39
+
+Verified closure and commutativity on all 256 pairs and associativity on all 4096 triples of the 16 toy2 points. `add` was not changed. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 38
 
 Added `EllipticCurve.toy2`, y^2 = x^3 + x over F_17 with G = (1, 6), N = 4, H = 4, documented as non-cyclic and not a secure group. Locked 16 enumerated points, G of order 4, (0, 0) of order 2, a 4-point subgroup of G, and (1, 6) + (6, 1) = (11, 4). Deviation from the work order: it expects `jInvariant toy2 = Some 6`, which is the value of its sign-dropped formula. The locked law is `Some 11`, because y^2 = x^3 + x has j = 1728 and 1728 = 11 mod 17. The test shows the hand computation. `toy` is unchanged. `dotnet test --configuration Release` passed.
