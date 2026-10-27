@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 36
+
+Locked the order-3 subgroup {Infinity, (0, 1), (0, 16)} on toy: closed under add, three points, not the full group of 18, and (6, 8) lies outside it. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 35
 
 Verified on toy that scalarMultiply k distributes over add for every residue k in 0 .. 17 and every pair, and that (k + m) Q equals kQ + mQ for k and m in 0 .. 17 on every point, where reduction modulo N is part of the law. No sampling. `dotnet test --configuration Release` passed.
