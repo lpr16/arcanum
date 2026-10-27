@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 45
+
+Locked `Modes.encryptEcb` on the phase 16 key and plaintext: the first block is the FIPS 197 Appendix C.1 ciphertext, the output is 32 bytes because PKCS#7 adds a full padding block, and `decryptEcb` returns the 16-byte plaintext. The padding block is not a second FIPS vector, and this is not a CAVP file. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 44
 
 Locked `double secp256k1 secp256k1.G` against the literal coordinates of 2G for the SEC 2 generator, and checked that point is on the curve. `add` was not changed. `dotnet test --configuration Release` passed.
