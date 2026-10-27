@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 44
+
+Locked `double secp256k1 secp256k1.G` against the literal coordinates of 2G for the SEC 2 generator, and checked that point is on the curve. `add` was not changed. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 43
 
 Added `Shamir.fs`: threshold-2 sharing over ToyField with polynomial secret + coefficient * x and Lagrange reconstruction through `ToyField.inverse`. Locked secret 5 and coefficient 3 giving shares 8, 11, and 14 at x = 1, 2, 3, every pair reconstructing 5, and refusal of a share at 0 and of two shares at the same x. No float. `dotnet test --configuration Release` passed.

@@ -1,5 +1,6 @@
 namespace Arcanum.Tests
 
+open System.Globalization
 open System.Numerics
 open Xunit
 open Arcanum.Core
@@ -36,6 +37,18 @@ module Secp256k1Tests =
         let nMinusOneG = unreducedDoubleAndAdd secp256k1 (secp256k1.N - BigInteger.One) secp256k1.G
         let negG = negate secp256k1 secp256k1.G
         Assert.Equal(negG, nMinusOneG)
+
+    [<Fact>]
+    let ``Phase 44 - Doubling the secp256k1 generator`` () =
+        // These literals are the double of the SEC 2 secp256k1 generator G.
+        // They are not the output of a previous run of scalarMultiply.
+        let hex (s: string) = BigInteger.Parse("0" + s, NumberStyles.HexNumber)
+        let expected =
+            Point(
+                hex "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+                hex "1ae168fea63dc339a3c58419466ceaeef7f632653266d0e1236431a950cfe52a")
+        Assert.Equal(expected, double secp256k1 secp256k1.G)
+        Assert.True(isOnCurve secp256k1 expected)
 
     [<Fact>]
     let ``nistP256 generator G lies on the curve`` () =
