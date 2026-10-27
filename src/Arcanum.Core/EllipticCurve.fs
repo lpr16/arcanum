@@ -47,6 +47,20 @@ module EllipticCurve =
                 ) curve.P
             left = right
 
+    /// j-invariant of y^2 = x^3 + a*x + b: -1728 * (4a)^3 * inverse(Delta) mod p, where Delta = -16 * (4a^3 + 27b^2).
+    /// This is c4^3 / Delta with c4 = -48a (Silverman, The Arithmetic of Elliptic Curves, III.1),
+    /// and it equals 1728 * 4a^3 / (4a^3 + 27b^2). A zero Delta is a singular curve and returns None.
+    let jInvariant (curve: Curve) : BigInteger option =
+        let a = curve.A
+        let b = curve.B
+        let delta = Modular.modPos (-16I * (4I * a * a * a + 27I * b * b)) curve.P
+        if delta = BigInteger.Zero then
+            None
+        else
+            Modular.modInverse delta curve.P
+            |> Option.map (fun invDelta ->
+                Modular.modPos (-1728I * Modular.modPow (4I * a) 3I curve.P * invDelta) curve.P)
+
     /// Point negation: -(x, y) = (x, -y mod p)
     let negate (curve: Curve) (pt: ECPoint) : ECPoint =
         match pt with

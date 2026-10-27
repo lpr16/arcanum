@@ -74,6 +74,14 @@ module ToyCurveTests =
         Assert.Equal(Infinity, p3)
 
     [<Fact>]
+    let ``Phase 37 - j-invariant of toy is zero and a singular curve has none`` () =
+        // A = 0, so (4A)^3 = 0. Delta = -16 * 27 = -432 = 10 (mod 17), which is not 0.
+        Assert.Equal(Some 0I, jInvariant toy)
+
+        // A = 0 and B = 0 give Delta = 0: y^2 = x^3 is singular.
+        Assert.Equal(None, jInvariant { toy with A = 0I; B = 0I })
+
+    [<Fact>]
     let ``Standard curve parameters remain intact`` () =
         Assert.Equal(BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", Globalization.NumberStyles.HexNumber), secp256k1.P)
         Assert.Equal(BigInteger.Parse("0FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF", Globalization.NumberStyles.HexNumber), nistP256.P)

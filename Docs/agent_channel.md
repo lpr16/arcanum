@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-27 - Claude Code - Phase 37
+
+Added `EllipticCurve.jInvariant` and locked `jInvariant toy = Some 0` and `None` for A = 0, B = 0, P = 17. Deviation from the work order: its formula `1728 * (4a)^3 * inverse(Delta)` omits a minus sign. The standard value is `-1728 * (4a)^3 / Delta`, which is c4^3 / Delta with c4 = -48a (Silverman III.1), and the code uses it. Both give 0 on toy. They differ on toy2 in phase 38, where y^2 = x^3 + x has j = 1728 = 11 mod 17, not 6. `dotnet test --configuration Release` passed.
+
 ### 2026-10-27 - Claude Code - Phase 36
 
 Locked the order-3 subgroup {Infinity, (0, 1), (0, 16)} on toy: closed under add, three points, not the full group of 18, and (6, 8) lies outside it. `dotnet test --configuration Release` passed.
