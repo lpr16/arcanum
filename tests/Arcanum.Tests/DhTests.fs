@@ -25,3 +25,16 @@ module DhTests =
 
         let expectedDirect = Modular.modPow 5I (6I * 15I) 23I
         Assert.Equal(2I, expectedDirect)
+
+    [<Fact>]
+    let ``Phase 46 - RFC 3526 group 5 parameter record shape`` () =
+        // RFC 3526 section 2: the 1536-bit MODP group with generator 2. No private key is exponentiated here.
+        let group = DiffieHellman.rfc3526Group5
+        Assert.Equal(2I, group.G)
+        Assert.False(group.P.IsEven)
+
+        // BigInteger.ToString("X") prints a leading zero nibble when the top bit is set.
+        let hex = group.P.ToString("X").TrimStart('0')
+        Assert.StartsWith("FFFFFFFFFFFFFFFFC90FDAA2", hex)
+        Assert.EndsWith("FFFFFFFFFFFFFFFF", hex)
+        Assert.True(group.P > BigInteger.Pow(2I, 1535))

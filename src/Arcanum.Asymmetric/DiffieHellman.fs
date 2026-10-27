@@ -12,15 +12,18 @@ module DiffieHellman =
         G: BigInteger
     }
 
-    /// RFC 3526 1536-bit MODP Group 5 (standard safe prime group).
+    /// RFC 3526 section 2, 1536-bit MODP Group 5: p = 2^1536 - 2^1472 - 1 + 2^64 * { [2^1406 pi] + 741804 }, g = 2.
+    /// The hexadecimal value is the one printed in RFC 3526 section 2.
     let rfc3526Group5 : DhGroup =
         let hex =
             "0FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
             "29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
             "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
             "E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED" +
-            "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE65381" +
-            "FFFFFFFFFFFFFFFF"
+            "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D" +
+            "C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F" +
+            "83655D23DCA3AD961C62F356208552BB9ED529077096966D" +
+            "670C354E4ABC9804F1746C08CA237327FFFFFFFFFFFFFFFF"
         let p = BigInteger.Parse(hex, NumberStyles.HexNumber)
         { P = p; G = 2I }
 
