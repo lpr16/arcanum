@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 53
+
+Added EllipticCurve.toy3 of prime order 19 over F_17 and locked enumeration, point orders, tangent doubling, chord addition, and j-invariant. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 52
 
 Added Rsa.modulusLength and Rsa.decryptOaep, corrected encryptOaep modulus byte length and big-endian I2OSP output, and locked OAEP round-trip and rejection checks. `dotnet test --configuration Release` passed.

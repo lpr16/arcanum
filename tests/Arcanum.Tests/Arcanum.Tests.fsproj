@@ -29,6 +29,7 @@
     <Compile Include="Toy2Tests.fs" />
     <Compile Include="Gf128Tests.fs" />
     <Compile Include="ShamirTests.fs" />
+    <Compile Include="Toy3Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>

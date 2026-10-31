@@ -209,3 +209,16 @@ module EllipticCurve =
             N = 4I
             H = 4I
         }
+
+    /// Third toy curve y^2 = x^3 + 2x + 2 over F_17, with prime order 19.
+    /// Because the group has prime order 19, every point other than Infinity generates it.
+    /// This toy curve is not a secure group.
+    let toy3 : Curve =
+        {
+            P = ToyField.prime
+            A = 2I
+            B = 2I
+            G = Point(5I, 1I)
+            N = 19I
+            H = 1I
+        }
