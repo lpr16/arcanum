@@ -38,19 +38,22 @@ module EllipticCurve =
         | CompressedInfinity
         | Compressed of x: BigInteger * yBit: int
 
-    /// Verifies if a point lies on the elliptic curve.
+    /// Verifies if a point lies on the elliptic curve with coordinates in 0 .. P - 1.
     let isOnCurve (curve: Curve) (pt: ECPoint) : bool =
         match pt with
         | Infinity -> true
         | Point(x, y) ->
-            let left = Modular.modPow y 2I curve.P
-            let right =
-                Modular.modPos (
-                    Modular.modPow x 3I curve.P +
-                    Modular.modPos (curve.A * x) curve.P +
-                    curve.B
-                ) curve.P
-            left = right
+            if x < BigInteger.Zero || x >= curve.P || y < BigInteger.Zero || y >= curve.P then
+                false
+            else
+                let left = Modular.modPow y 2I curve.P
+                let right =
+                    Modular.modPos (
+                        Modular.modPow x 3I curve.P +
+                        Modular.modPos (curve.A * x) curve.P +
+                        curve.B
+                    ) curve.P
+                left = right
 
     /// j-invariant of y^2 = x^3 + a*x + b: -1728 * (4a)^3 * inverse(Delta) mod p, where Delta = -16 * (4a^3 + 27b^2).
     /// This is c4^3 / Delta with c4 = -48a (Silverman, The Arithmetic of Elliptic Curves, III.1),

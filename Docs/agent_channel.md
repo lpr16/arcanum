@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 51
+
+Updated EllipticCurve.isOnCurve to require 0 <= x < P and 0 <= y < P and locked out-of-range coordinate rejection on toy. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 50
 
 Corrected two j-invariant lines in Docs/antigravity_research_program.md, updated the phase 21 PBKDF2 comment, and locked the RFC 7914 section 11 PBKDF2-HMAC-SHA256 vector. `dotnet test --configuration Release` passed.

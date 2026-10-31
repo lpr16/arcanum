@@ -118,3 +118,20 @@ module ToyCurveTests =
                     let left = add toy (add toy q r) s
                     let right = add toy q (add toy r s)
                     Assert.Equal(left, right)
+
+    [<Fact>]
+    let ``Phase 51 - isOnCurve rejects coordinates outside 0 .. P - 1`` () =
+        Assert.False(isOnCurve toy (Point(23I, 8I)))
+        Assert.True(isOnCurve toy (Point(6I, 8I)))
+        Assert.False(isOnCurve toy (Point(6I, -9I)))
+        Assert.Equal(18, enumeratedPoints.Length)
+        let toy2Points =
+            Infinity :: [
+                for x in 0I .. (toy2.P - 1I) do
+                    for y in 0I .. (toy2.P - 1I) do
+                        let pt = Point(x, y)
+                        if isOnCurve toy2 pt then
+                            yield pt
+            ]
+        Assert.Equal(16, toy2Points.Length)
+
