@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 76
+
+Added Rfc6979.sign and locked RFC 6979 section A.2.5 deterministic ECDSA signatures for "sample" and "test" on NIST P-256. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 75
 
 Locked the RFC 6979 section A.2.5 NIST P-256 public key U via scalarMultiply, scalarMultiplyLadder, and validatePublicKey. `dotnet test --configuration Release` passed.

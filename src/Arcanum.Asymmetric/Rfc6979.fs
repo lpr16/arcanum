@@ -73,3 +73,8 @@ module Rfc6979 =
                 v <- (HMAC.hmacSha256 (Key k) v).Value
                 loop ()
         loop ()
+
+    /// Signs a message deterministically per RFC 6979 using generateK and Ecdsa.signWithNonce without low-s normalization.
+    let sign (keyPair: Ecdsa.EcdsaKeyPair) (message: byte[]) : Result<EcdsaSignature, CryptoError> =
+        let k = generateK keyPair.Curve.N keyPair.PrivateKey message
+        Ecdsa.signWithNonce keyPair message k
