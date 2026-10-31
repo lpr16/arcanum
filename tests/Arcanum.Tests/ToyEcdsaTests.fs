@@ -1,74 +1,77 @@
 namespace Arcanum.Tests
 
-open System
+open System.Globalization
 open System.Numerics
 open System.Text
 open Xunit
 open Arcanum.Core
-open Arcanum.Hashing
 open Arcanum.Asymmetric
 
 module ToyEcdsaTests =
 
-    // EllipticCurve.toy is a 18-point curve over F_17; toy is not a secure group.
-    // The message representative z uses SHA256.hash, which is the CLR library call
-    // System.Security.Cryptography.SHA256.HashData. This test uses a caller-supplied
-    // nonce with signWithNonce; it is not RFC 6979.
+    // EllipticCurve.toy3 is a 19-point curve over F_17; toy3 is not a secure group.
+    // Ecdsa.messageRepresentative follows SEC 1 section 4.1.3 and uses SHA256.hash,
+    // which is the CLR library call System.Security.Cryptography.SHA256.HashData.
+    // These tests pass a caller-supplied nonce to signWithNonce; this is not RFC 6979.
 
     let private repeatedAdd (curve: EllipticCurve.Curve) (count: int) (pt: EllipticCurve.ECPoint) =
         [ 1 .. count ]
         |> List.fold (fun acc _ -> EllipticCurve.add curve acc pt) EllipticCurve.Infinity
 
-    let private messageRepresentative (curve: EllipticCurve.Curve) (message: byte[]) : BigInteger =
-        let digest = (SHA256.hash message).Value
-        let buf = Array.zeroCreate (digest.Length + 1)
-        Array.Copy(digest, 0, buf, 0, digest.Length)
-        Modular.modPos (BigInteger(ReadOnlySpan<byte>(buf))) curve.N
+    [<Fact>]
+    let ``Phase 55 - SEC 1 messageRepresentative on NIST P-256 and toy3`` () =
+        let sampleBytes = Encoding.ASCII.GetBytes("sample")
+        let expectedH1 =
+            BigInteger.Parse(
+                "0AF2BDBE1AA9B6EC1E2ADE1D694F41FC71A831D0268E9891562113D8A62ADD1BF",
+                NumberStyles.HexNumber)
+        Assert.Equal(expectedH1, Ecdsa.messageRepresentative EllipticCurve.nistP256 sampleBytes)
+
+        Assert.Equal(5L, (19I).GetBitLength())
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let msgEx = Encoding.ASCII.GetBytes("ex")
+        Assert.Equal(3I, Ecdsa.messageRepresentative EllipticCurve.toy3 msgEc)
+        Assert.Equal(10I, Ecdsa.messageRepresentative EllipticCurve.toy3 msgEx)
 
     [<Fact>]
-    let ``Phase 26 - ECDSA signWithNonce and verify on toy curve`` () =
-        let curve = EllipticCurve.toy
+    let ``Phase 55 - ECDSA signWithNonce and verify on toy3`` () =
+        let curve = EllipticCurve.toy3
         let d = 5I
-        let k = 7I
+        let k = 4I
         let msgEc = Encoding.ASCII.GetBytes("ec")
         let msgEx = Encoding.ASCII.GetBytes("ex")
 
         let pubPoint = repeatedAdd curve 5 curve.G
+        Assert.Equal(EllipticCurve.Point(9I, 16I), pubPoint)
+
+        let noncePoint = repeatedAdd curve 4 curve.G
+        Assert.Equal(EllipticCurve.Point(3I, 1I), noncePoint)
+
         let keyPair: Ecdsa.EcdsaKeyPair = {
             PrivateKey = d
             PublicKey = pubPoint
             Curve = curve
         }
 
-        let noncePoint = repeatedAdd curve 7 curve.G
-        let expectedR =
-            match noncePoint with
-            | EllipticCurve.Point(x, _) -> Modular.modPos x 18I
-            | EllipticCurve.Infinity ->
-                Assert.Fail("Expected finite point for 7 * G on toy")
-                0I
+        // 4^(-1) = 5 (mod 19).
+        // For "ec": e1 = 3, r = 3, s1 = 5 * (3 + 3 * 5) = 90 = 14 (mod 19).
+        // For "ex": e2 = 10, r = 3, s2 = 5 * (10 + 3 * 5) = 125 = 11 (mod 19).
+        match Ecdsa.signWithNonce keyPair msgEc k, Ecdsa.signWithNonce keyPair msgEx k with
+        | Ok sigEc, Ok sigEx ->
+            Assert.Equal({ R = 3I; S = 14I }, sigEc)
+            Assert.Equal({ R = 3I; S = 11I }, sigEx)
+            Assert.True(Ecdsa.verify curve pubPoint msgEc sigEc)
+            Assert.True(Ecdsa.verify curve pubPoint msgEx sigEx)
+            Assert.False(Ecdsa.verify curve pubPoint msgEx sigEc)
+        | _ ->
+            Assert.Fail("Expected both signatures on toy3 to succeed")
 
-        match Ecdsa.signWithNonce keyPair msgEc k with
-        | Error err -> Assert.Fail($"Expected signature, got error: {err}")
-        | Ok signature ->
-            Assert.Equal(expectedR, signature.R)
-
-            let z = messageRepresentative curve msgEc
-            match Modular.modInverse k 18I with
-            | None -> Assert.Fail("Expected invertible nonce 7 modulo 18")
-            | Some kInv ->
-                let expectedS = Modular.modPos (kInv * (z + signature.R * d)) 18I
-                Assert.Equal(expectedS, signature.S)
-
-            Assert.True(Ecdsa.verify curve pubPoint msgEc signature)
-            Assert.False(Ecdsa.verify curve pubPoint msgEx signature)
-
-    // The toy curve group has 18 points and is not a place to keep a key.
+    // The toy3 curve group has 19 points and is not a place to keep a key.
     [<Fact>]
-    let ``Phase 27 - Repeated nonce on toy curve exposes the private scalar`` () =
-        let curve = EllipticCurve.toy
+    let ``Phase 55 - Repeated nonce on toy3 exposes nonce and private key in closed form`` () =
+        let curve = EllipticCurve.toy3
         let d = 5I
-        let k = 7I
+        let k = 4I
         let msgEc = Encoding.ASCII.GetBytes("ec")
         let msgEx = Encoding.ASCII.GetBytes("ex")
 
@@ -81,38 +84,20 @@ module ToyEcdsaTests =
 
         match Ecdsa.signWithNonce keyPair msgEc k, Ecdsa.signWithNonce keyPair msgEx k with
         | Ok sig1, Ok sig2 ->
+            Assert.Equal(3I, sig1.R)
             Assert.Equal(sig1.R, sig2.R)
             let r = sig1.R
-            let z1 = messageRepresentative curve msgEc
-            let z2 = messageRepresentative curve msgEx
-            let deltaS = Modular.modPos (sig1.S - sig2.S) curve.N
-            let deltaZ = Modular.modPos (z1 - z2) curve.N
+            let e1 = Ecdsa.messageRepresentative curve msgEc
+            let e2 = Ecdsa.messageRepresentative curve msgEx
 
-            let recoveredScalars =
-                [ 1I .. curve.N - 1I ]
-                |> List.choose (fun kCand ->
-                    match Modular.modInverse kCand curve.N with
-                    | None -> None
-                    | Some kInv ->
-                        let matchesLinear =
-                            Modular.modPos (deltaS * kCand) curve.N = deltaZ
-                        let matchesR =
-                            match repeatedAdd curve (int kCand) curve.G with
-                            | EllipticCurve.Point(x, _) -> Modular.modPos x curve.N = r
-                            | EllipticCurve.Infinity -> false
-                        if matchesLinear && matchesR then
-                            [ 1I .. curve.N - 1I ]
-                            |> List.filter (fun dCand ->
-                                Modular.modInverse dCand curve.N |> Option.isSome
-                                && Modular.modPos (kInv * (z1 + r * dCand)) curve.N = sig1.S
-                                && Modular.modPos (kInv * (z2 + r * dCand)) curve.N = sig2.S)
-                            |> Some
-                        else
-                            None)
-                |> List.concat
-
-            let recoveredD = Assert.Single(recoveredScalars)
-            Assert.Equal(5I, recoveredD)
+            match Modular.modInverse (Modular.modPos (sig1.S - sig2.S) curve.N) curve.N,
+                  Modular.modInverse r curve.N with
+            | Some invDeltaS, Some invR ->
+                let recoveredK = Modular.modPos ((e1 - e2) * invDeltaS) curve.N
+                let recoveredD = Modular.modPos ((sig1.S * recoveredK - e1) * invR) curve.N
+                Assert.Equal(4I, recoveredK)
+                Assert.Equal(5I, recoveredD)
+            | _ ->
+                Assert.Fail("Expected s1 - s2 and r to be invertible modulo 19")
         | _ ->
-            Assert.Fail("Expected both signatures with nonce 7 to succeed")
-
+            Assert.Fail("Expected both signatures on toy3 to succeed")

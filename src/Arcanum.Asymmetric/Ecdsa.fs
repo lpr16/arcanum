@@ -18,13 +18,20 @@ module Ecdsa =
         let pub = EllipticCurve.scalarMultiply curve priv curve.G
         { PrivateKey = priv; PublicKey = pub; Curve = curve }
 
-    /// Converts message bytes to an integer hash representative modulo n.
-    let private hashToInt (message: byte[]) (curve: EllipticCurve.Curve) : BigInteger =
+    /// Converts message bytes to an ECDSA integer hash representative per SEC 1 section 4.1.3.
+    /// Hashes with SHA256.hash (which calls the CLR System.Security.Cryptography.SHA256.HashData),
+    /// reads the 256-bit digest as a big-endian unsigned integer, keeps the leftmost bitLength N bits
+    /// when bitLength N < 256, and reduces modulo N.
+    let messageRepresentative (curve: EllipticCurve.Curve) (message: byte[]) : BigInteger =
         let digest = (SHA256.hash message).Value
-        let buf = Array.zeroCreate (digest.Length + 1)
-        Array.Copy(digest, 0, buf, 0, digest.Length)
-        let z = BigInteger(ReadOnlySpan<byte>(buf))
-        Modular.modPos z curve.N
+        let raw = BigInteger(ReadOnlySpan<byte>(digest), isUnsigned = true, isBigEndian = true)
+        let nBits = int (curve.N.GetBitLength())
+        let shifted =
+            if nBits < 256 then
+                raw >>> (256 - nBits)
+            else
+                raw
+        Modular.modPos shifted curve.N
 
     /// Signs a message using ECDSA with a specified nonce k (useful for testing or RFC 6979).
     let signWithNonce (keyPair: EcdsaKeyPair) (message: byte[]) (k: BigInteger) : Result<EcdsaSignature, CryptoError> =
@@ -42,7 +49,7 @@ module Ecdsa =
                     match Modular.modInverse k curve.N with
                     | None -> Error (NonInvertibleElement "Nonce k is not invertible modulo n")
                     | Some kInv ->
-                        let z = hashToInt message curve
+                        let z = messageRepresentative curve message
                         let s = Modular.modPos (kInv * (z + r * keyPair.PrivateKey)) curve.N
                         if s = BigInteger.Zero then
                             Error (CorruptedState "Signature s is zero")
@@ -67,7 +74,7 @@ module Ecdsa =
         else
             match Modular.modInverse sigVal.S curve.N with
             | None ->
-                let z = hashToInt message curve
+                let z = messageRepresentative curve message
                 let target =
                     EllipticCurve.add
                         curve
@@ -84,7 +91,7 @@ module Ecdsa =
                             Modular.modPos x1 curve.N = sigVal.R
                             && EllipticCurve.scalarMultiply curve sigVal.S kPt = target)
             | Some w ->
-                let z = hashToInt message curve
+                let z = messageRepresentative curve message
                 let u1 = Modular.modPos (z * w) curve.N
                 let u2 = Modular.modPos (sigVal.R * w) curve.N
 

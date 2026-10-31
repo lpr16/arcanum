@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 55
+
+Replaced Ecdsa.hashToInt with SEC 1 Ecdsa.messageRepresentative, updated CLI nonce-reuse demo to call it, and moved the toy ECDSA signature and nonce-reuse laws to prime-order toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 54
 
 Locked group law closure, commutativity on all 361 pairs, associativity on all 6859 triples, and scalar multiplication agreement with repeated addition on toy3. `dotnet test --configuration Release` passed.

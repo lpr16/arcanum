@@ -250,14 +250,8 @@ module Program =
             printInfo $"Signatures have identical Nonce Point R: {shortR1}..."
             printInfo "Attacker uses linear algebra mod n to extract private key..."
 
-            let hashToInt (msg: byte[]) =
-                let d = (SHA256.hash msg).Value
-                let buf = Array.zeroCreate (d.Length + 1)
-                Array.Copy(d, 0, buf, 0, d.Length)
-                Modular.modPos (BigInteger(ReadOnlySpan<byte>(buf))) curve.N
-
-            let z1 = hashToInt m1
-            let z2 = hashToInt m2
+            let z1 = Ecdsa.messageRepresentative curve m1
+            let z2 = Ecdsa.messageRepresentative curve m2
             let num = Modular.modPos (z1 - z2) curve.N
             let den = Modular.modPos (sig1.S - sig2.S) curve.N
 
