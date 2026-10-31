@@ -14,6 +14,7 @@
     <Compile Include="DiffieHellman.fs" />
     <Compile Include="Rsa.fs" />
     <Compile Include="Ecdsa.fs" />
+    <Compile Include="Rfc6979.fs" />
   </ItemGroup>
 
 </Project>

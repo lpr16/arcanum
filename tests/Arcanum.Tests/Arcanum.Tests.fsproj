@@ -36,6 +36,7 @@
     <Compile Include="LadderTests.fs" />
     <Compile Include="DiscreteLogTests.fs" />
     <Compile Include="CountingTests.fs" />
+    <Compile Include="Rfc6979Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
