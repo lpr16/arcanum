@@ -1,5 +1,6 @@
 namespace Arcanum.Tests
 
+open System.Globalization
 open System.Numerics
 open Xunit
 open Arcanum.Core
@@ -65,3 +66,34 @@ module JacobianTests =
                     Assert.Equal(
                         EllipticCurve.add curve q r,
                         Jacobian.toAffine curve (Jacobian.add curve qLifted rLifted))
+
+    let private unreducedJacobianDoubleAndAdd (curve: EllipticCurve.Curve) (scalar: BigInteger) (pt: EllipticCurve.ECPoint) : EllipticCurve.ECPoint =
+        if scalar <= BigInteger.Zero || pt = EllipticCurve.Infinity then
+            EllipticCurve.Infinity
+        else
+            let mutable res = Jacobian.ofAffine EllipticCurve.Infinity
+            let mutable addend = Jacobian.ofAffine pt
+            let mutable s = scalar
+            while s > BigInteger.Zero do
+                if (s &&& BigInteger.One) = BigInteger.One then
+                    res <- Jacobian.add curve res addend
+                addend <- Jacobian.double curve addend
+                s <- s >>> 1
+            Jacobian.toAffine curve res
+
+    [<Fact>]
+    let ``Phase 63 - Jacobian double and unreduced double-and-add on secp256k1 and NIST P-256`` () =
+        let hex (s: string) = BigInteger.Parse("0" + s, NumberStyles.HexNumber)
+        let expectedDoubleG =
+            EllipticCurve.Point(
+                hex "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+                hex "1ae168fea63dc339a3c58419466ceaeef7f632653266d0e1236431a950cfe52a")
+        Assert.Equal(
+            expectedDoubleG,
+            Jacobian.toAffine EllipticCurve.secp256k1 (Jacobian.double EllipticCurve.secp256k1 (Jacobian.ofAffine EllipticCurve.secp256k1.G)))
+
+        for curve in [ EllipticCurve.secp256k1; EllipticCurve.nistP256 ] do
+            Assert.Equal(EllipticCurve.Infinity, unreducedJacobianDoubleAndAdd curve curve.N curve.G)
+            Assert.Equal(
+                EllipticCurve.negate curve curve.G,
+                unreducedJacobianDoubleAndAdd curve (curve.N - 1I) curve.G)
