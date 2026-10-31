@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 67
+
+Added DiscreteLog.babyStepGiantStep with integer ceiling square root and locked agreement with bruteForce on toy and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 66
 
 Added DiscreteLog.bruteForce for the toy curves and locked discrete logarithm laws on toy and toy3. `dotnet test --configuration Release` passed.
