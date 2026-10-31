@@ -33,3 +33,65 @@ module Jacobian =
                 let x = Modular.modPos (pt.X * zInv2) p
                 let y = Modular.modPos (pt.Y * zInv3) p
                 EllipticCurve.Point(x, y)
+
+    /// Point doubling in Jacobian coordinates for y^2 = x^3 + a*x + b modulo P.
+    /// If Z1 = 0 or Y1 = 0, returns (1 : 1 : 0). Otherwise:
+    /// S = 4 * X1 * Y1^2, M = 3 * X1^2 + a * Z1^4,
+    /// X3 = M^2 - 2 * S, Y3 = M * (S - X3) - 8 * Y1^4, Z3 = 2 * Y1 * Z1 (all modulo P).
+    /// Second implementation of the group law checked against EllipticCurve.add; no constant-time claim is made.
+    let double (curve: EllipticCurve.Curve) (pt: JacobianPoint) : JacobianPoint =
+        let p = curve.P
+        let x1 = Modular.modPos pt.X p
+        let y1 = Modular.modPos pt.Y p
+        let z1 = Modular.modPos pt.Z p
+        if z1 = BigInteger.Zero || y1 = BigInteger.Zero then
+            { X = BigInteger.One; Y = BigInteger.One; Z = BigInteger.Zero }
+        else
+            let y1Sq = Modular.modPos (y1 * y1) p
+            let y1Fourth = Modular.modPos (y1Sq * y1Sq) p
+            let z1Sq = Modular.modPos (z1 * z1) p
+            let z1Fourth = Modular.modPos (z1Sq * z1Sq) p
+            let s = Modular.modPos (4I * x1 * y1Sq) p
+            let m = Modular.modPos (3I * x1 * x1 + curve.A * z1Fourth) p
+            let x3 = Modular.modPos (m * m - 2I * s) p
+            let y3 = Modular.modPos (m * (s - x3) - 8I * y1Fourth) p
+            let z3 = Modular.modPos (2I * y1 * z1) p
+            { X = x3; Y = y3; Z = z3 }
+
+    /// Point addition in Jacobian coordinates for y^2 = x^3 + a*x + b modulo P.
+    /// If either Z is 0, returns the other point. Otherwise:
+    /// U1 = X1 * Z2^2, U2 = X2 * Z1^2, S1 = Y1 * Z2^3, S2 = Y2 * Z1^3.
+    /// If U1 = U2: when S1 = S2 returns double p1, otherwise returns (1 : 1 : 0).
+    /// Otherwise H = U2 - U1, R = S2 - S1,
+    /// X3 = R^2 - H^3 - 2 * U1 * H^2, Y3 = R * (U1 * H^2 - X3) - S1 * H^3, Z3 = H * Z1 * Z2 (all modulo P).
+    /// Second implementation of the group law checked against EllipticCurve.add; no constant-time claim is made.
+    let add (curve: EllipticCurve.Curve) (p1: JacobianPoint) (p2: JacobianPoint) : JacobianPoint =
+        let p = curve.P
+        let z1 = Modular.modPos p1.Z p
+        let z2 = Modular.modPos p2.Z p
+        if z1 = BigInteger.Zero then p2
+        elif z2 = BigInteger.Zero then p1
+        else
+            let z1Sq = Modular.modPos (z1 * z1) p
+            let z1Cube = Modular.modPos (z1Sq * z1) p
+            let z2Sq = Modular.modPos (z2 * z2) p
+            let z2Cube = Modular.modPos (z2Sq * z2) p
+            let u1 = Modular.modPos (p1.X * z2Sq) p
+            let u2 = Modular.modPos (p2.X * z1Sq) p
+            let s1 = Modular.modPos (p1.Y * z2Cube) p
+            let s2 = Modular.modPos (p2.Y * z1Cube) p
+            if u1 = u2 then
+                if s1 = s2 then
+                    double curve p1
+                else
+                    { X = BigInteger.One; Y = BigInteger.One; Z = BigInteger.Zero }
+            else
+                let h = Modular.modPos (u2 - u1) p
+                let r = Modular.modPos (s2 - s1) p
+                let hSq = Modular.modPos (h * h) p
+                let hCube = Modular.modPos (hSq * h) p
+                let u1hSq = Modular.modPos (u1 * hSq) p
+                let x3 = Modular.modPos (r * r - hCube - 2I * u1hSq) p
+                let y3 = Modular.modPos (r * (u1hSq - x3) - s1 * hCube) p
+                let z3 = Modular.modPos (h * z1 * z2) p
+                { X = x3; Y = y3; Z = z3 }

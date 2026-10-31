@@ -37,3 +37,31 @@ module JacobianTests =
             for y in 0I .. 16I do
                 let zZeroPt : Jacobian.JacobianPoint = { X = x; Y = y; Z = 0I }
                 Assert.Equal(EllipticCurve.Infinity, Jacobian.toAffine EllipticCurve.toy zZeroPt)
+
+    let private liftWithLambda (curve: EllipticCurve.Curve) (lambda: BigInteger) (pt: EllipticCurve.ECPoint) : Jacobian.JacobianPoint =
+        match pt with
+        | EllipticCurve.Infinity -> { X = 1I; Y = 1I; Z = 0I }
+        | EllipticCurve.Point(x, y) ->
+            let p = curve.P
+            let l2 = Modular.modPos (lambda * lambda) p
+            let l3 = Modular.modPos (l2 * lambda) p
+            {
+                X = Modular.modPos (x * l2) p
+                Y = Modular.modPos (y * l3) p
+                Z = Modular.modPos lambda p
+            }
+
+    [<Fact>]
+    let ``Phase 62 - Jacobian double and add agree with EllipticCurve group law on toy, toy2, and toy3`` () =
+        for curve in [ EllipticCurve.toy; EllipticCurve.toy2; EllipticCurve.toy3 ] do
+            let pts = allPoints curve
+            for q in pts do
+                Assert.Equal(
+                    EllipticCurve.double curve q,
+                    Jacobian.toAffine curve (Jacobian.double curve (Jacobian.ofAffine q)))
+                let qLifted = liftWithLambda curve 3I q
+                for r in pts do
+                    let rLifted = liftWithLambda curve 5I r
+                    Assert.Equal(
+                        EllipticCurve.add curve q r,
+                        Jacobian.toAffine curve (Jacobian.add curve qLifted rLifted))

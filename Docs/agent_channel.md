@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 62
+
+Added Jacobian.double and Jacobian.add and locked agreement with EllipticCurve.double and EllipticCurve.add across all points and pairs of toy, toy2, and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 61
 
 Added Jacobian.JacobianPoint, Jacobian.ofAffine, and Jacobian.toAffine and locked affine conversion and projective scaling equivalence on toy, toy2, and toy3. `dotnet test --configuration Release` passed.
