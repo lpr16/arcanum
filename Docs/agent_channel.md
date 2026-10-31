@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 60
+
+Added DiffieHellman.computeEcdhSharedSecretChecked and locked the invalid-curve point Point(1, 0) parity leak and refusal on toy. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 59
 
 Added EllipticCurve.multiplyUnreduced and EllipticCurve.validatePublicKey per SEC 1 section 3.2.2.1 and locked public-key validation laws on toy3, toy, and non-cyclic toy2. `dotnet test --configuration Release` passed.

@@ -55,5 +55,11 @@ module DiffieHellman =
         { PrivateKey = priv; PublicKey = pub }
 
     /// Computes the shared point on the curve: S = myPrivateKey * otherPublicKey.
+    /// Does not validate that otherPublicKey is on the curve; use computeEcdhSharedSecretChecked for SEC 1 validation.
     let computeEcdhSharedSecret (curve: EllipticCurve.Curve) (myPrivateKey: BigInteger) (otherPublicKey: EllipticCurve.ECPoint) : EllipticCurve.ECPoint =
         EllipticCurve.scalarMultiply curve myPrivateKey otherPublicKey
+
+    /// Validates otherPublicKey with EllipticCurve.validatePublicKey before computing S = myPrivateKey * otherPublicKey.
+    let computeEcdhSharedSecretChecked (curve: EllipticCurve.Curve) (myPrivateKey: BigInteger) (otherPublicKey: EllipticCurve.ECPoint) : Result<EllipticCurve.ECPoint, CryptoError> =
+        EllipticCurve.validatePublicKey curve otherPublicKey
+        |> Result.map (fun () -> EllipticCurve.scalarMultiply curve myPrivateKey otherPublicKey)

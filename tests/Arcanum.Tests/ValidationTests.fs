@@ -2,6 +2,7 @@ namespace Arcanum.Tests
 
 open Xunit
 open Arcanum.Core
+open Arcanum.Asymmetric
 
 module ValidationTests =
 
@@ -50,3 +51,25 @@ module ValidationTests =
             |> List.filter (fun pt -> pt <> EllipticCurve.Infinity)
             |> List.distinct
         Assert.Equal(3, gSubgroupNonInfinity.Length)
+
+    [<Fact>]
+    let ``Phase 60 - Invalid-curve point on toy leaks scalar parity and is refused by computeEcdhSharedSecretChecked`` () =
+        let curve = EllipticCurve.toy
+        let invalidPt = EllipticCurve.Point(1I, 0I)
+
+        // Point(1, 0) is not on toy (y^2 = x^3 + 1), and it is on y^2 = x^3 + 16 modulo 17.
+        Assert.False(EllipticCurve.isOnCurve curve invalidPt)
+        let x, y = 1I, 0I
+        Assert.Equal(Modular.modPos (y * y) 17I, Modular.modPos (x * x * x + 16I) 17I)
+
+        for d in 1I .. 17I do
+            let mult = EllipticCurve.scalarMultiply curve d invalidPt
+            let isEven = (d % 2I) = 0I
+            Assert.Equal(isEven, (mult = EllipticCurve.Infinity))
+            match DiffieHellman.computeEcdhSharedSecretChecked curve d invalidPt with
+            | Error _ -> ()
+            | Ok _ -> Assert.Fail("Expected computeEcdhSharedSecretChecked to refuse invalid-curve point")
+
+        let q = EllipticCurve.scalarMultiply curve 5I curve.G
+        let expected = DiffieHellman.computeEcdhSharedSecret curve 7I q
+        Assert.Equal(Ok expected, DiffieHellman.computeEcdhSharedSecretChecked curve 7I q)
