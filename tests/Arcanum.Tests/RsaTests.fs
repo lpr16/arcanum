@@ -59,3 +59,35 @@ module RsaTests =
         // The current function returns an empty mask for length 0.
         Assert.Empty(Rsa.mgf1 [||] 0)
 
+    [<Fact>]
+    let ``Phase 52 - RSA-OAEP modulusLength, round-trips, length boundary, and tampering rejection`` () =
+        // These are round-trip checks with a random seed, not an RFC 8017 known-answer vector.
+        Assert.Equal(256, Rsa.modulusLength ((2I ** 2047) + 1I))
+        Assert.Equal(2, Rsa.modulusLength 3233I)
+
+        let keyPair = Rsa.generateKeyPair 1024
+        let k = Rsa.modulusLength keyPair.PublicKey.N
+        let emptyLabel = [||]
+
+        for msgLen in [ 0; 1; k - 66 ] do
+            let msg = Array.init msgLen (fun i -> byte (i + 1))
+            match Rsa.encryptOaep keyPair.PublicKey emptyLabel msg with
+            | Error err -> Assert.Fail($"Expected OAEP encryption to succeed for length {msgLen}, got {err}")
+            | Ok ct ->
+                Assert.Equal(k, ct.Length)
+                match Rsa.decryptOaep keyPair.PrivateKey emptyLabel ct with
+                | Error err -> Assert.Fail($"Expected OAEP decryption to succeed for length {msgLen}, got {err}")
+                | Ok dec -> Assert.Equal<byte>(msg, dec)
+
+        let tooLong = Array.zeroCreate (k - 65)
+        Assert.True(Result.isError (Rsa.encryptOaep keyPair.PublicKey emptyLabel tooLong))
+
+        match Rsa.encryptOaep keyPair.PublicKey emptyLabel [| 0x42uy |] with
+        | Error err -> Assert.Fail($"Expected encryption to succeed, got {err}")
+        | Ok validCt ->
+            let flipped = Array.copy validCt
+            flipped.[flipped.Length - 1] <- flipped.[flipped.Length - 1] ^^^ 0x01uy
+            Assert.True(Result.isError (Rsa.decryptOaep keyPair.PrivateKey emptyLabel flipped))
+            Assert.True(Result.isError (Rsa.decryptOaep keyPair.PrivateKey [| 0x01uy |] validCt))
+
+

@@ -96,13 +96,25 @@ module Rsa =
 
         mask
 
+    /// Byte length of an RSA modulus N: (bitLength N + 7) / 8.
+    let modulusLength (n: BigInteger) : int =
+        if n <= BigInteger.Zero then 0
+        else int ((n.GetBitLength() + 7L) / 8L)
+
+    let private i2osp (value: BigInteger) (len: int) : byte[] =
+        let raw = value.ToByteArray(isUnsigned = true, isBigEndian = true)
+        let result = Array.zeroCreate len
+        let copyLen = min len raw.Length
+        Array.Copy(raw, raw.Length - copyLen, result, len - copyLen, copyLen)
+        result
+
     /// RSA-OAEP Encryption with SHA-256 per RFC 8017.
     let encryptOaep (pubKey: RsaPublicKey) (label: byte[]) (plaintext: byte[]) : Result<byte[], CryptoError> =
-        let k = (pubKey.N.ToByteArray().Length)
+        let k = modulusLength pubKey.N
         let hLen = 32
         let maxMlen = k - 2 * hLen - 2
 
-        if plaintext.Length > maxMlen then
+        if maxMlen < 0 || plaintext.Length > maxMlen then
             Error (ParameterOutOfRange $"Message too long for RSA key size (max {maxMlen} bytes)")
         else
             let lHash = (SHA256.hash label).Value
@@ -121,10 +133,43 @@ module Rsa =
 
             // EM = 0x00 || maskedSeed || maskedDB
             let em = Array.concat [ [| 0x00uy |]; maskedSeed; maskedDb ]
-            let mInt = BigInteger(ReadOnlySpan<byte>(Array.rev em))
+            let mInt = BigInteger(ReadOnlySpan<byte>(em), isUnsigned = true, isBigEndian = true)
             let cInt = encryptRaw pubKey mInt
-            let cBytes = cInt.ToByteArray()
-            let result = Array.zeroCreate k
-            let copyLen = min k cBytes.Length
-            Array.Copy(cBytes, 0, result, 0, copyLen)
-            Ok result
+            Ok (i2osp cInt k)
+
+    /// RSA-OAEP Decryption with SHA-256 per RFC 8017 section 7.1.2, using decryptCrt.
+    let decryptOaep (privKey: RsaPrivateKey) (label: byte[]) (ciphertext: byte[]) : Result<byte[], CryptoError> =
+        let k = modulusLength privKey.N
+        let hLen = 32
+
+        if ciphertext.Length <> k || k < 2 * hLen + 2 then
+            Error (DecryptionFailed "Invalid RSA-OAEP ciphertext length")
+        else
+            let cInt = BigInteger(ReadOnlySpan<byte>(ciphertext), isUnsigned = true, isBigEndian = true)
+            if cInt >= privKey.N then
+                Error (DecryptionFailed "Ciphertext representative out of range")
+            else
+                let mInt = decryptCrt privKey cInt
+                let em = i2osp mInt k
+                let y = em.[0]
+                let maskedSeed = em.[1 .. hLen]
+                let maskedDb = em.[hLen + 1 .. k - 1]
+
+                let seedMask = mgf1 maskedDb hLen
+                let seed = Bytes.xor maskedSeed seedMask
+                let dbMask = mgf1 seed (k - hLen - 1)
+                let db = Bytes.xor maskedDb dbMask
+
+                let lHash = (SHA256.hash label).Value
+                let lHashPrime = db.[0 .. hLen - 1]
+                let rest = db.[hLen .. db.Length - 1]
+                let sepIdx = rest |> Array.tryFindIndex (fun b -> b <> 0uy)
+
+                if y <> 0uy || lHashPrime <> lHash then
+                    Error (DecryptionFailed "RSA-OAEP header or label hash mismatch")
+                else
+                    match sepIdx with
+                    | Some idx when rest.[idx] = 0x01uy ->
+                        Ok rest.[idx + 1 .. rest.Length - 1]
+                    | _ ->
+                        Error (DecryptionFailed "RSA-OAEP missing 0x01 separator")
