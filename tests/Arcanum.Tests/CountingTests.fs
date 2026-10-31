@@ -53,3 +53,31 @@ module CountingTests =
         Assert.True(tToy * tToy <= fourP)
         Assert.True(tToy2 * tToy2 <= fourP)
         Assert.True(tToy3 * tToy3 <= fourP)
+
+    [<Fact>]
+    let ``Phase 72 - Quadratic twists of toy, toy2, and toy3`` () =
+        Assert.Equal(-1, Modular.jacobi 3I 17I)
+        // 6^2 = 36 = 2 (mod 17), so jacobi 2 17 = 1 and d = 2 is refused.
+        Assert.Equal(1, Modular.jacobi 2I 17I)
+        match EllipticCurve.twistCoefficients EllipticCurve.toy 2I with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected d = 2 (quadratic residue mod 17) to be refused")
+
+        let checkTwist (curve: EllipticCurve.Curve) (expectedA: BigInteger) (expectedB: BigInteger) (expectedTwistCount: BigInteger) =
+            match EllipticCurve.twistCoefficients curve 3I with
+            | Error err -> Assert.Fail(sprintf "Expected twistCoefficients to succeed: %A" err)
+            | Ok (aTwist, bTwist) ->
+                Assert.Equal(expectedA, aTwist)
+                Assert.Equal(expectedB, bTwist)
+                let twistCount = EllipticCurve.countPoints curve.P aTwist bTwist
+                Assert.Equal(expectedTwistCount, twistCount)
+                let twistCurve = { curve with A = aTwist; B = bTwist }
+                let enumCount = BigInteger (allPoints twistCurve).Length
+                Assert.Equal(expectedTwistCount, enumCount)
+                let origCount = EllipticCurve.countPoints curve.P curve.A curve.B
+                Assert.Equal(36I, origCount + twistCount)
+
+        // d = 3: d^2 = 9, d^3 = 27 = 10 (mod 17).
+        checkTwist EllipticCurve.toy 0I 10I 18I
+        checkTwist EllipticCurve.toy2 9I 0I 20I
+        checkTwist EllipticCurve.toy3 1I 3I 17I

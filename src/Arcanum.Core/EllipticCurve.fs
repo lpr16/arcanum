@@ -214,6 +214,19 @@ module EllipticCurve =
             x <- x + BigInteger.One
         p + BigInteger.One + sum
 
+    /// Returns the quadratic twist coefficients (a * d^2 mod P, b * d^3 mod P) for a quadratic non-residue d,
+    /// and refuses d when Modular.jacobi d curve.P <> -1.
+    let twistCoefficients (curve: Curve) (d: BigInteger) : Result<BigInteger * BigInteger, CryptoError> =
+        if Modular.jacobi d curve.P <> -1 then
+            Error (ParameterOutOfRange "Quadratic twist requires a quadratic non-residue d with jacobi d P = -1")
+        else
+            let p = curve.P
+            let d2 = Modular.modPos (d * d) p
+            let d3 = Modular.modPos (d2 * d) p
+            let aTwist = Modular.modPos (curve.A * d2) p
+            let bTwist = Modular.modPos (curve.B * d3) p
+            Ok (aTwist, bTwist)
+
     /// Standard curve parameters for secp256k1 (Bitcoin, Ethereum).
     let secp256k1 : Curve =
         let p = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", Globalization.NumberStyles.HexNumber)
