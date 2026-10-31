@@ -30,6 +30,7 @@
     <Compile Include="Gf128Tests.fs" />
     <Compile Include="ShamirTests.fs" />
     <Compile Include="Toy3Tests.fs" />
+    <Compile Include="Sec1Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
