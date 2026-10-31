@@ -1,5 +1,6 @@
 namespace Arcanum.Tests
 
+open System
 open Xunit
 open Arcanum.Core
 
@@ -43,3 +44,30 @@ module Sec1Tests =
         match Sec1.decodePoint curve [| 0x05uy; 0x06uy |] with
         | Error _ -> ()
         | Ok _ -> Assert.Fail("Expected 05 06 to be refused for unknown prefix")
+
+    [<Fact>]
+    let ``Phase 58 - Compressed and uncompressed generators of NIST P-256 and secp256k1`` () =
+        let p256 = EllipticCurve.nistP256
+        let k1 = EllipticCurve.secp256k1
+
+        let expectedP256Compressed =
+            Convert.FromHexString("036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296")
+        let expectedK1Compressed =
+            Convert.FromHexString("0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")
+
+        let actualP256Compressed = Sec1.encodePoint p256 true p256.G
+        let actualK1Compressed = Sec1.encodePoint k1 true k1.G
+
+        Assert.Equal<byte[]>(expectedP256Compressed, actualP256Compressed)
+        Assert.Equal<byte[]>(expectedK1Compressed, actualK1Compressed)
+
+        Assert.Equal(Ok p256.G, Sec1.decodePoint p256 actualP256Compressed)
+        Assert.Equal(Ok k1.G, Sec1.decodePoint k1 actualK1Compressed)
+
+        let p256Uncompressed = Sec1.encodePoint p256 false p256.G
+        let k1Uncompressed = Sec1.encodePoint k1 false k1.G
+
+        Assert.Equal(65, p256Uncompressed.Length)
+        Assert.Equal(65, k1Uncompressed.Length)
+        Assert.Equal(Ok p256.G, Sec1.decodePoint p256 p256Uncompressed)
+        Assert.Equal(Ok k1.G, Sec1.decodePoint k1 k1Uncompressed)

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 58
+
+Locked SEC 1 compressed and uncompressed encoding and decoding of the secp256k1 and NIST P-256 generators. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 57
 
 Added Sec1.encodePoint and Sec1.decodePoint per SEC 1 sections 2.3.3 and 2.3.4 and locked point encoding, decoding, and refusal laws on toy. `dotnet test --configuration Release` passed.
