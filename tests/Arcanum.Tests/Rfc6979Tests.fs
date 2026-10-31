@@ -54,3 +54,17 @@ module Rfc6979Tests =
         let kTest = Rfc6979.generateK q x (Encoding.ASCII.GetBytes("test"))
         let expectedKTest = hexInt "D16B6AE827F17175E040871A1C7EC3500192C4C92677336EC2537ACAEE0008E0"
         Assert.Equal(expectedKTest, kTest)
+
+    [<Fact>]
+    let ``Phase 75 - RFC 6979 section A.2.5 public key U on NIST P-256`` () =
+        let curve = EllipticCurve.nistP256
+        let x = hexInt "C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721"
+        let expectedU =
+            EllipticCurve.Point(
+                hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+
+        let u = EllipticCurve.scalarMultiply curve x curve.G
+        Assert.Equal(expectedU, u)
+        Assert.Equal(expectedU, EllipticCurve.scalarMultiplyLadder curve x curve.G)
+        Assert.Equal(Ok (), EllipticCurve.validatePublicKey curve u)
