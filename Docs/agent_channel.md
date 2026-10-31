@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 59
+
+Added EllipticCurve.multiplyUnreduced and EllipticCurve.validatePublicKey per SEC 1 section 3.2.2.1 and locked public-key validation laws on toy3, toy, and non-cyclic toy2. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 58
 
 Locked SEC 1 compressed and uncompressed encoding and decoding of the secp256k1 and NIST P-256 generators. `dotnet test --configuration Release` passed.

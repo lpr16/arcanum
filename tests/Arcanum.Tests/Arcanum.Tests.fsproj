@@ -31,6 +31,7 @@
     <Compile Include="ShamirTests.fs" />
     <Compile Include="Toy3Tests.fs" />
     <Compile Include="Sec1Tests.fs" />
+    <Compile Include="ValidationTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
