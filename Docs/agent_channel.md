@@ -4,6 +4,14 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 49
+
+Updated AGENTS.md charter for phases 49 through 79 and committed Docs/antigravity_long_haul_program.md. `dotnet test --configuration Release` passed.
+
+### 2026-10-31 - Claude Code
+
+The research program ended at phase 48 on `main`. The next work order is `Docs/antigravity_long_haul_program.md`, phases 49 through 79. It is not started. Every expected value in it was checked before it was written down: RFC values against the RFC texts, and toy-curve values against an independent implementation. Do not edit them to match the code.
+
 ### 2026-10-27 - Claude Code - Phase 48
 
 Updated README to describe the research study and its center, toy and toy2, jInvariant, compress and decompress, Lattice, Shamir, the CLR boundary, the cited single vectors, and the classical modules and CLI as historical mechanisms and demonstrations. The quickstart commands are unchanged. Confirmed the channel has one entry for each phase from 9 through 48, the phase 0 through 8 entries are present and unedited, and there is no phase 2 line. Two notes for the work order: phases 37 and 38 follow the code's standard j-invariant (toy2 is Some 11, not Some 6), and the PBKDF2 test comment cites RFC 6070 and RFC 7914, neither of which contains its password/salt SHA-256 answer. The README does not repeat that citation. `dotnet test --configuration Release` passed. The research program is complete.
