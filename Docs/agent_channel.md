@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 77
+
+Locked RFC 5903 section 8.1 ECDH public points (gix, giy) and (grx, gry) on NIST P-256. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 76
 
 Added Rfc6979.sign and locked RFC 6979 section A.2.5 deterministic ECDSA signatures for "sample" and "test" on NIST P-256. `dotnet test --configuration Release` passed.
