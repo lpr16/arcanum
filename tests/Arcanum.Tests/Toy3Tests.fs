@@ -53,3 +53,25 @@ module Toy3Tests =
         // jInvariant: Delta = -16 * 4 = 4, (4a)^3 = 512 = 2, 4^(-1) = 13, -1728 = 6,
         // so j = 6 * 2 * 13 = 3 (mod 17).
         Assert.Equal(Some 3I, jInvariant toy3)
+
+    [<Fact>]
+    let ``Phase 54 - Group law closure and commutativity on all 361 pairs of toy3`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                let sumQR = add toy3 q r
+                Assert.Contains(sumQR, enumeratedPoints)
+                Assert.Equal(sumQR, add toy3 r q)
+
+    [<Fact>]
+    let ``Phase 54 - Group law associativity on all 6859 triples of toy3`` () =
+        for q in enumeratedPoints do
+            for r in enumeratedPoints do
+                for s in enumeratedPoints do
+                    Assert.Equal(add toy3 (add toy3 q r) s, add toy3 q (add toy3 r s))
+
+    [<Fact>]
+    let ``Phase 54 - Scalar multiplication on toy3 agrees with repeated addition for residues 0 to 18`` () =
+        for q in enumeratedPoints do
+            for k in 0 .. 18 do
+                Assert.Equal(repeatedAdd q k, scalarMultiply toy3 (bigint k) q)
+
