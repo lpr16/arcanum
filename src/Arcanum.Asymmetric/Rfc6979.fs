@@ -3,6 +3,7 @@ namespace Arcanum.Asymmetric
 open System
 open System.Numerics
 open Arcanum.Core
+open Arcanum.Hashing
 
 module Rfc6979 =
     let private qBitLength (q: BigInteger) : int =
@@ -41,3 +42,34 @@ module Rfc6979 =
         let z1 = bits2int q octets
         let z2 = Modular.modPos z1 q
         int2octets q z2
+
+    /// RFC 6979 section 3.2 deterministic nonce generation (steps a through h) with SHA-256.
+    /// CLR boundaries: the message digest is SHA256.hash (which calls System.Security.Cryptography.SHA256.HashData),
+    /// and HMAC_K is HMAC.hmacSha256 (the F# HMAC construction built on SHA256.hash).
+    let generateK (q: BigInteger) (privateKey: BigInteger) (message: byte[]) : BigInteger =
+        let qlen = qBitLength q
+        let h1 = (SHA256.hash message).Value
+        let xOctets = int2octets q privateKey
+        let h1Octets = bits2octets q h1
+
+        let mutable v = Array.create 32 0x01uy
+        let mutable k = Array.create 32 0x00uy
+
+        k <- (HMAC.hmacSha256 (Key k) (Array.concat [ v; [| 0x00uy |]; xOctets; h1Octets ])).Value
+        v <- (HMAC.hmacSha256 (Key k) v).Value
+        k <- (HMAC.hmacSha256 (Key k) (Array.concat [ v; [| 0x01uy |]; xOctets; h1Octets ])).Value
+        v <- (HMAC.hmacSha256 (Key k) v).Value
+
+        let rec loop () =
+            let mutable t = [||]
+            while 8 * t.Length < qlen do
+                v <- (HMAC.hmacSha256 (Key k) v).Value
+                t <- Array.append t v
+            let candidate = bits2int q t
+            if candidate >= BigInteger.One && candidate < q then
+                candidate
+            else
+                k <- (HMAC.hmacSha256 (Key k) (Array.append v [| 0x00uy |])).Value
+                v <- (HMAC.hmacSha256 (Key k) v).Value
+                loop ()
+        loop ()

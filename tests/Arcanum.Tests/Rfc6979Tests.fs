@@ -41,3 +41,16 @@ module Rfc6979Tests =
 
         let hEc = (SHA256.hash (Encoding.ASCII.GetBytes("ec"))).Value
         Assert.Equal(3I, Rfc6979.bits2int 19I hEc)
+
+    [<Fact>]
+    let ``Phase 74 - RFC 6979 section A.2.5 deterministic nonces k on NIST P-256`` () =
+        let q = EllipticCurve.nistP256.N
+        let x = hexInt "C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721"
+
+        let kSample = Rfc6979.generateK q x (Encoding.ASCII.GetBytes("sample"))
+        let expectedKSample = hexInt "A6E3C57DD01ABE90086538398355DD4C3B17AA873382B0F24D6129493D8AAD60"
+        Assert.Equal(expectedKSample, kSample)
+
+        let kTest = Rfc6979.generateK q x (Encoding.ASCII.GetBytes("test"))
+        let expectedKTest = hexInt "D16B6AE827F17175E040871A1C7EC3500192C4C92677336EC2537ACAEE0008E0"
+        Assert.Equal(expectedKTest, kTest)
