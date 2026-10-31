@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 61
+
+Added Jacobian.JacobianPoint, Jacobian.ofAffine, and Jacobian.toAffine and locked affine conversion and projective scaling equivalence on toy, toy2, and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 60
 
 Added DiffieHellman.computeEcdhSharedSecretChecked and locked the invalid-curve point Point(1, 0) parity leak and refusal on toy. `dotnet test --configuration Release` passed.

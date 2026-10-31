@@ -16,6 +16,7 @@
     <Compile Include="Lattice.fs" />
     <Compile Include="Shamir.fs" />
     <Compile Include="Sec1.fs" />
+    <Compile Include="Jacobian.fs" />
   </ItemGroup>
 
 </Project>
