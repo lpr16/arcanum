@@ -73,3 +73,16 @@ module ValidationTests =
         let q = EllipticCurve.scalarMultiply curve 5I curve.G
         let expected = DiffieHellman.computeEcdhSharedSecret curve 7I q
         Assert.Equal(Ok expected, DiffieHellman.computeEcdhSharedSecretChecked curve 7I q)
+
+    [<Fact>]
+    let ``Phase 69 - Small-subgroup point Point(0, 1) on toy passes validatePublicKey and leaks d mod 3`` () =
+        // Point(0, 1) has order 3 on toy (where N = 18), so it lies on the curve and 18 * Point(0, 1) = Infinity.
+        // Contrast this with prime-order toy3 (order 19), where phase 53 showed every point other than Infinity
+        // has order 19, so no point of small order exists to send.
+        let curve = EllipticCurve.toy
+        let smallOrderPt = EllipticCurve.Point(0I, 1I)
+        Assert.Equal(Ok (), EllipticCurve.validatePublicKey curve smallOrderPt)
+
+        for d in 1I .. 17I do
+            let shared = DiffieHellman.computeEcdhSharedSecret curve d smallOrderPt
+            Assert.Equal(Some (d % 3I), DiscreteLog.bruteForce curve smallOrderPt shared)

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 69
+
+Locked the small-subgroup leak of d mod 3 via Point(0, 1) on composite-order toy even when validatePublicKey passes. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 68
 
 Added DiscreteLog.pohligHellman combining prime-power subgroup digits via bruteForce and Modular.crt, and locked laws on toy and toy3. `dotnet test --configuration Release` passed.
