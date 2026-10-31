@@ -24,3 +24,14 @@ module LadderTests =
                     Assert.Equal(
                         EllipticCurve.scalarMultiply curve k q,
                         EllipticCurve.scalarMultiplyLadder curve k q)
+
+    [<Fact>]
+    let ``Phase 65 - scalarMultiplyLadder on secp256k1 and NIST P-256`` () =
+        // Note: scalarMultiplyLadder reduces its scalar modulo N, so N * G = Infinity would follow from reduction;
+        // unreduced order checks remain in phases 7 and 63.
+        for curve in [ EllipticCurve.secp256k1; EllipticCurve.nistP256 ] do
+            Assert.Equal(curve.G, EllipticCurve.scalarMultiplyLadder curve 1I curve.G)
+            Assert.Equal(EllipticCurve.double curve curve.G, EllipticCurve.scalarMultiplyLadder curve 2I curve.G)
+            Assert.Equal(
+                EllipticCurve.negate curve curve.G,
+                EllipticCurve.scalarMultiplyLadder curve (curve.N - 1I) curve.G)
