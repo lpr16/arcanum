@@ -34,6 +34,7 @@
     <Compile Include="ValidationTests.fs" />
     <Compile Include="JacobianTests.fs" />
     <Compile Include="LadderTests.fs" />
+    <Compile Include="DiscreteLogTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

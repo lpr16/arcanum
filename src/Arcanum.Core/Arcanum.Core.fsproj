@@ -17,6 +17,7 @@
     <Compile Include="Shamir.fs" />
     <Compile Include="Sec1.fs" />
     <Compile Include="Jacobian.fs" />
+    <Compile Include="DiscreteLog.fs" />
   </ItemGroup>
 
 </Project>

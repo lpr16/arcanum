@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 66
+
+Added DiscreteLog.bruteForce for the toy curves and locked discrete logarithm laws on toy and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 65
 
 Locked scalarMultiplyLadder checks for 1, 2, and N - 1 on secp256k1 and NIST P-256. `dotnet test --configuration Release` passed.
