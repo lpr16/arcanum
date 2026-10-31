@@ -30,3 +30,26 @@ module CountingTests =
         Assert.Equal(BigInteger (allPoints EllipticCurve.toy).Length, countToy)
         Assert.Equal(BigInteger (allPoints EllipticCurve.toy2).Length, countToy2)
         Assert.Equal(BigInteger (allPoints EllipticCurve.toy3).Length, countToy3)
+
+    [<Fact>]
+    let ``Phase 71 - Frobenius traces and Hasse bound on toy, toy2, and toy3`` () =
+        // Trace of Frobenius t = p + 1 - #E; Hasse's theorem says t^2 <= 4p.
+        // Trace 0 makes toy supersingular over F_17 (no pairing is added here).
+        let p = 17I
+        let tToy = p + 1I - EllipticCurve.countPoints p 0I 1I
+        let tToy2 = p + 1I - EllipticCurve.countPoints p 1I 0I
+        let tToy3 = p + 1I - EllipticCurve.countPoints p 2I 2I
+
+        Assert.Equal(0I, tToy)
+        Assert.Equal(2I, tToy2)
+        Assert.Equal(-1I, tToy3)
+
+        Assert.Equal(0I, tToy * tToy)
+        Assert.Equal(4I, tToy2 * tToy2)
+        Assert.Equal(1I, tToy3 * tToy3)
+
+        let fourP = 4I * p
+        Assert.Equal(68I, fourP)
+        Assert.True(tToy * tToy <= fourP)
+        Assert.True(tToy2 * tToy2 <= fourP)
+        Assert.True(tToy3 * tToy3 <= fourP)

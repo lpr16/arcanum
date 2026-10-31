@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 71
+
+Locked Frobenius traces (0, 2, -1) and integer Hasse bound checks on toy, toy2, and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 70
 
 Added EllipticCurve.countPoints using Modular.jacobi and locked point counts and enumeration agreement on toy, toy2, and toy3. `dotnet test --configuration Release` passed.
