@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 79
+
+Updated README.md to document toy3, coordinate range in isOnCurve, Sec1 encoding, multiplyUnreduced, validatePublicKey, Jacobian, scalarMultiplyLadder, DiscreteLog, countPoints, Hasse bound, twistCoefficients, SEC 1 messageRepresentative, Rfc6979, Rsa.decryptOaep, and the cited checks from RFC 7914 section 11, RFC 6979 sections A.1.2 and A.2.5, and RFC 5903 section 8.1. Confirmed Docs/agent_channel.md has one entry for each phase from 49 through 79 and that all entries from phases 0 through 48 remain intact. `dotnet test --configuration Release` passed. The long-haul program is complete.
+
 ### 2026-10-31 - Antigravity - Phase 78
 
 Locked the RFC 5903 section 8.1 ECDH shared point (girx, giry) and shared secret girx on NIST P-256 via computeEcdhSharedSecret and computeEcdhSharedSecretChecked. `dotnet test --configuration Release` passed.
