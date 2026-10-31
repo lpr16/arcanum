@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 64
+
+Added EllipticCurve.scalarMultiplyLadder and locked agreement with EllipticCurve.scalarMultiply across all points and scalars on toy, toy2, and toy3. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 63
 
 Locked Jacobian doubling of secp256k1.G and unreduced Jacobian double-and-add order checks on secp256k1 and NIST P-256. `dotnet test --configuration Release` passed.

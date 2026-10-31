@@ -131,6 +131,26 @@ module EllipticCurve =
 
             res
 
+    /// Montgomery-style ladder scalar multiplication on the short Weierstrass curve (not a Montgomery-form curve).
+    /// Reduces the scalar modulo N, starts with R0 = Infinity and R1 = pt, and walks bitLength N bits from the top.
+    /// Every step performs one addition and one doubling with R1 - R0 = pt throughout.
+    /// Although the sequence of group operations does not depend on the bits, this code still branches and uses BigInteger;
+    /// no constant-time claim is made.
+    let scalarMultiplyLadder (curve: Curve) (kVal: BigInteger) (pt: ECPoint) : ECPoint =
+        let k = Modular.modPos kVal curve.N
+        let nBits = int (curve.N.GetBitLength())
+        let mutable r0 = Infinity
+        let mutable r1 = pt
+        for bitIndex = nBits - 1 downto 0 do
+            let bit = (k >>> bitIndex) &&& BigInteger.One
+            if bit = BigInteger.One then
+                r0 <- add curve r0 r1
+                r1 <- double curve r1
+            else
+                r1 <- add curve r0 r1
+                r0 <- double curve r0
+        r0
+
     /// Double-and-add on the bits of a non-negative scalar without reducing modulo N.
     let multiplyUnreduced (curve: Curve) (k: BigInteger) (pt: ECPoint) : ECPoint =
         if k <= BigInteger.Zero || pt = Infinity then

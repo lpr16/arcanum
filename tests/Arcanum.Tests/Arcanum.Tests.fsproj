@@ -33,6 +33,7 @@
     <Compile Include="Sec1Tests.fs" />
     <Compile Include="ValidationTests.fs" />
     <Compile Include="JacobianTests.fs" />
+    <Compile Include="LadderTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
