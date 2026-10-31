@@ -47,3 +47,20 @@ module DiscreteLogTests =
         Assert.Equal(
             None,
             DiscreteLog.babyStepGiantStep EllipticCurve.toy (EllipticCurve.Point(0I, 1I)) EllipticCurve.toy.G 3I)
+
+    [<Fact>]
+    let ``Phase 68 - DiscreteLog pohligHellman on toy and toy3`` () =
+        let toyFactors = [ (2I, 1); (3I, 2) ]
+        for k in 0 .. 17 do
+            let kG = repeatedAdd EllipticCurve.toy k EllipticCurve.toy.G
+            Assert.Equal(Ok (BigInteger k), DiscreteLog.pohligHellman EllipticCurve.toy EllipticCurve.toy.G kG toyFactors)
+
+        let toy3Factors = [ (19I, 1) ]
+        for k in 0 .. 18 do
+            let kG = repeatedAdd EllipticCurve.toy3 k EllipticCurve.toy3.G
+            Assert.Equal(Ok (BigInteger k), DiscreteLog.pohligHellman EllipticCurve.toy3 EllipticCurve.toy3.G kG toy3Factors)
+
+        // Product 2 * 3 = 6 <> 18 (the order of G on toy), so pohligHellman returns Error.
+        match DiscreteLog.pohligHellman EllipticCurve.toy EllipticCurve.toy.G EllipticCurve.toy.G [ (2I, 1); (3I, 1) ] with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected pohligHellman to refuse factors whose product is not the order of G")
