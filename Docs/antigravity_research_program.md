@@ -691,7 +691,7 @@ The set `{Infinity; Point(0, 1); Point(0, 16)}` is closed under `add`. It has th
 
 ### Object
 
-`jInvariant : Curve -> BigInteger option`. For `y^2 = x^3 + a x + b` the value is `1728 * (4a)^3 * inverse(Delta)` modulo `P`, where `Delta = -16 * (4 a^3 + 27 b^2)`. A zero `Delta` returns `None`. Use `Modular.modInverse` and `Modular.modPos`. Do not use a floating-point division.
+`jInvariant : Curve -> BigInteger option`. For `y^2 = x^3 + a x + b` the value is `-1728 * (4a)^3 * inverse(Delta)` modulo `P`, where `Delta = -16 * (4 a^3 + 27 b^2)`. A zero `Delta` returns `None`. Use `Modular.modInverse` and `Modular.modPos`. Do not use a floating-point division.
 
 ### Laws
 
@@ -730,7 +730,7 @@ The comment says the group is not cyclic, `G` does not generate it, and the curv
 - Repeated addition of `Point(0, 0)` reaches `Infinity` at step `2`.
 - The subgroup of `G` has 4 points, not 16.
 - `add toy2 (Point(1, 6)) (Point(6, 1))` is `Point(11, 4)`. Slope `(1 - 6) * (6 - 1)^(-1) ≡ 16`, then `x ≡ 11` and `y ≡ 4`.
-- `jInvariant toy2` is `Some 6`.
+- `jInvariant toy2` is `Some 11`, which is 1728 modulo 17.
 
 ### Exit
 
