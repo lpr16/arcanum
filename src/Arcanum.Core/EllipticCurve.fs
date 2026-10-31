@@ -200,6 +200,20 @@ module EllipticCurve =
                 let y = if int (root &&& BigInteger.One) = yBit then root else Modular.modPos (-root) curve.P
                 if int (y &&& BigInteger.One) = yBit then Some (Point(x, y)) else None)
 
+    /// Counts points on y^2 = x^3 + a*x + b over F_p for an odd prime p as
+    /// p + 1 + sum_{x = 0}^{p - 1} jacobi (x^3 + a*x + b) p using Modular.jacobi.
+    /// A zero symbol adds 0 and stands for the single point with y = 0.
+    /// Loops over every x in 0 .. p - 1; meant for the toy curves only, not Schoof's algorithm,
+    /// and must not be called on the large curves (secp256k1 or nistP256).
+    let countPoints (p: BigInteger) (a: BigInteger) (b: BigInteger) : BigInteger =
+        let mutable sum = BigInteger.Zero
+        let mutable x = BigInteger.Zero
+        while x < p do
+            let rhs = Modular.modPos (x * x * x + a * x + b) p
+            sum <- sum + BigInteger (Modular.jacobi rhs p)
+            x <- x + BigInteger.One
+        p + BigInteger.One + sum
+
     /// Standard curve parameters for secp256k1 (Bitcoin, Ethereum).
     let secp256k1 : Curve =
         let p = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", Globalization.NumberStyles.HexNumber)
