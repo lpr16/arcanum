@@ -101,3 +101,38 @@ module ToyEcdsaTests =
                 Assert.Fail("Expected s1 - s2 and r to be invertible modulo 19")
         | _ ->
             Assert.Fail("Expected both signatures on toy3 to succeed")
+
+    [<Fact>]
+    let ``Phase 56 - ECDSA verify and signWithNonce refusals`` () =
+        let curve = EllipticCurve.toy3
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+
+        // On toy3 with public key Infinity, message "ec" (representative 3), and signature (R, S) = (5, 3):
+        // the old verify would accept it, because u1 = 3 * 3^(-1) = 1 (mod 19), u2 * Infinity = Infinity,
+        // u1 * G = (5, 1), and x = 5 = R. The new verify refuses Infinity as a public key.
+        Assert.False(Ecdsa.verify curve EllipticCurve.Infinity msgEc { R = 5I; S = 3I })
+
+        let d = 5I
+        let pubPoint = repeatedAdd curve 5 curve.G
+        let keyPair: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = d
+            PublicKey = pubPoint
+            Curve = curve
+        }
+
+        // On toy3 with d = 5: k = 7 gives 7G = (0, 6) and r = 0, so signWithNonce refuses it.
+        Assert.Equal(EllipticCurve.Point(0I, 6I), repeatedAdd curve 7 curve.G)
+        match Ecdsa.signWithNonce keyPair msgEc 7I with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected signWithNonce with k = 7 (r = 0) to return Error")
+
+        // On toy3 with d = 5: k = 9 gives 9G = (7, 6), r = 7, and 9^(-1) * (3 + 7 * 5) = 17 * 38 = 0 (mod 19),
+        // so s = 0 and signWithNonce refuses it.
+        Assert.Equal(EllipticCurve.Point(7I, 6I), repeatedAdd curve 9 curve.G)
+        match Ecdsa.signWithNonce keyPair msgEc 9I with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected signWithNonce with k = 9 (s = 0) to return Error")
+
+        // On toy (N = 18), S = 6 is not invertible modulo 18, so verify returns false.
+        let toyPub = EllipticCurve.toy.G
+        Assert.False(Ecdsa.verify EllipticCurve.toy toyPub msgEc { R = 6I; S = 6I })

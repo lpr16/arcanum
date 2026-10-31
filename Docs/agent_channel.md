@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-10-31 - Antigravity - Phase 56
+
+Refused Infinity as a public key and removed the non-invertible S fallback branch in Ecdsa.verify, and locked ECDSA verify and signWithNonce refusal laws on toy3 and toy. `dotnet test --configuration Release` passed.
+
 ### 2026-10-31 - Antigravity - Phase 55
 
 Replaced Ecdsa.hashToInt with SEC 1 Ecdsa.messageRepresentative, updated CLI nonce-reuse demo to call it, and moved the toy ECDSA signature and nonce-reuse laws to prime-order toy3. `dotnet test --configuration Release` passed.

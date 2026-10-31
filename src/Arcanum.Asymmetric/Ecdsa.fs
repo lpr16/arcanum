@@ -68,28 +68,13 @@ module Ecdsa =
 
     /// Verifies an ECDSA signature against the public key and message.
     let verify (curve: EllipticCurve.Curve) (pubKey: EllipticCurve.ECPoint) (message: byte[]) (sigVal: EcdsaSignature) : bool =
-        if sigVal.R <= BigInteger.Zero || sigVal.R >= curve.N then false
+        if pubKey = EllipticCurve.Infinity then false
+        elif sigVal.R <= BigInteger.Zero || sigVal.R >= curve.N then false
         elif sigVal.S <= BigInteger.Zero || sigVal.S >= curve.N then false
         elif not (EllipticCurve.isOnCurve curve pubKey) then false
         else
             match Modular.modInverse sigVal.S curve.N with
-            | None ->
-                let z = messageRepresentative curve message
-                let target =
-                    EllipticCurve.add
-                        curve
-                        (EllipticCurve.scalarMultiply curve z curve.G)
-                        (EllipticCurve.scalarMultiply curve sigVal.R pubKey)
-                [ BigInteger.One .. curve.N - BigInteger.One ]
-                |> List.exists (fun k ->
-                    match Modular.modInverse k curve.N with
-                    | None -> false
-                    | Some _ ->
-                        match EllipticCurve.scalarMultiply curve k curve.G with
-                        | EllipticCurve.Infinity -> false
-                        | EllipticCurve.Point(x1, _) as kPt ->
-                            Modular.modPos x1 curve.N = sigVal.R
-                            && EllipticCurve.scalarMultiply curve sigVal.S kPt = target)
+            | None -> false
             | Some w ->
                 let z = messageRepresentative curve message
                 let u1 = Modular.modPos (z * w) curve.N
