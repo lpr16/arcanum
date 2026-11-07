@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 111
+
+Added EllipticCurve.multiScalarMultiply (Shamir's trick) in EllipticCurve.fs and locked all 6859 cases on toy3, all 324 cases with Point(0, 1) on toy, and G + U on NIST P-256 in NafTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 110
 
 Added EllipticCurve.wnaf and EllipticCurve.scalarMultiplyWnaf in EllipticCurve.fs and locked width-4 NAF laws across 0 .. 2000, toy curves, and NIST P-256 in NafTests.fs. `dotnet test --configuration Release` passed.

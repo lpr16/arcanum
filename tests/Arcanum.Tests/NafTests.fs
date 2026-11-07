@@ -118,3 +118,35 @@ module NafTests =
                 hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
                 hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
         Assert.Equal(expectedU, EllipticCurve.scalarMultiplyWnaf EllipticCurve.nistP256 4 x EllipticCurve.nistP256.G)
+
+    [<Fact>]
+    let ``Phase 111 - Shamir's trick multiScalarMultiply across all 6859 cases on toy3, toy, and NIST P-256`` () =
+        let toy3 = EllipticCurve.toy3
+        let toy3Pts = allPoints toy3
+        Assert.Equal(19, toy3Pts.Length)
+        let mutable count = 0
+        for p2 in toy3Pts do
+            for u1 in 0I .. 18I do
+                let u1G = EllipticCurve.scalarMultiply toy3 u1 toy3.G
+                for u2 in 0I .. 18I do
+                    let u2P2 = EllipticCurve.scalarMultiply toy3 u2 p2
+                    let expected = EllipticCurve.add toy3 u1G u2P2
+                    Assert.Equal(expected, EllipticCurve.multiScalarMultiply toy3 u1 toy3.G u2 p2)
+                    count <- count + 1
+        Assert.Equal(6859, count)
+
+        let toy = EllipticCurve.toy
+        let p2Toy = EllipticCurve.Point(0I, 1I)
+        for u1 in 0I .. 17I do
+            let u1G = EllipticCurve.scalarMultiply toy u1 toy.G
+            for u2 in 0I .. 17I do
+                let u2P2 = EllipticCurve.scalarMultiply toy u2 p2Toy
+                let expected = EllipticCurve.add toy u1G u2P2
+                Assert.Equal(expected, EllipticCurve.multiScalarMultiply toy u1 toy.G u2 p2Toy)
+
+        let p256 = EllipticCurve.nistP256
+        let u =
+            EllipticCurve.Point(
+                hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        Assert.Equal(EllipticCurve.add p256 p256.G u, EllipticCurve.multiScalarMultiply p256 1I p256.G 1I u)

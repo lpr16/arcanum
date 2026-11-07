@@ -253,6 +253,30 @@ module EllipticCurve =
                     acc <- add curve acc (negate curve table.[(-d - 1) / 2])
             acc
 
+    /// Simultaneous double-scalar multiplication u1 * P1 + u2 * P2 (Straus / Shamir's trick):
+    /// reduces both scalars modulo N, precomputes P1 + P2, and walks the bits of both scalars from the top bit of the larger one.
+    /// Checked against EllipticCurve.add; no constant-time claim is made.
+    let multiScalarMultiply (curve: Curve) (u1Val: BigInteger) (p1: ECPoint) (u2Val: BigInteger) (p2: ECPoint) : ECPoint =
+        let u1 = Modular.modPos u1Val curve.N
+        let u2 = Modular.modPos u2Val curve.N
+        if u1 = BigInteger.Zero && u2 = BigInteger.Zero then
+            Infinity
+        else
+            let p1PlusP2 = add curve p1 p2
+            let maxBits = max (int (u1.GetBitLength())) (int (u2.GetBitLength()))
+            let mutable acc = Infinity
+            for bitIndex = maxBits - 1 downto 0 do
+                acc <- double curve acc
+                let b1 = (u1 >>> bitIndex) &&& BigInteger.One
+                let b2 = (u2 >>> bitIndex) &&& BigInteger.One
+                if b1 = BigInteger.One && b2 = BigInteger.One then
+                    acc <- add curve acc p1PlusP2
+                elif b1 = BigInteger.One then
+                    acc <- add curve acc p1
+                elif b2 = BigInteger.One then
+                    acc <- add curve acc p2
+            acc
+
     /// Public-key validation per SEC 1 section 3.2.2.1.
     /// Refuses Infinity, refuses a point that fails isOnCurve (including the 0 .. P - 1 coordinate range),
     /// and refuses a point with multiplyUnreduced curve curve.N Q <> Infinity.
