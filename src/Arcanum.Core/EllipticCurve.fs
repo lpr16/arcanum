@@ -184,6 +184,26 @@ module EllipticCurve =
             k <- (k - BigInteger d) / 2I
         List.rev digits
 
+    /// Scalar multiplication using the non-adjacent form (NAF): reduces the scalar modulo N,
+    /// starts from Infinity, and walks the NAF digits from the most significant (doubling at each step,
+    /// then adding P for 1 or negate P for -1).
+    /// Third scalar multiplication checked against EllipticCurve.add; no constant-time claim is made.
+    let scalarMultiplyNaf (curve: Curve) (kVal: BigInteger) (pt: ECPoint) : ECPoint =
+        let k = Modular.modPos kVal curve.N
+        if k = BigInteger.Zero || pt = Infinity then
+            Infinity
+        else
+            let negPt = negate curve pt
+            let digitsMostFirst = List.rev (naf k)
+            let mutable acc = Infinity
+            for d in digitsMostFirst do
+                acc <- double curve acc
+                if d = 1 then
+                    acc <- add curve acc pt
+                elif d = -1 then
+                    acc <- add curve acc negPt
+            acc
+
     /// Public-key validation per SEC 1 section 3.2.2.1.
     /// Refuses Infinity, refuses a point that fails isOnCurve (including the 0 .. P - 1 coordinate range),
     /// and refuses a point with multiplyUnreduced curve curve.N Q <> Infinity.
