@@ -198,3 +198,38 @@ module Modular =
         while x >= p do
             x <- x - p
         x
+
+    /// The NIST P-256 field prime 2^256 - 2^224 + 2^192 + 2^96 - 1.
+    let nistP256Prime : BigInteger =
+        (BigInteger.One <<< 256) - (BigInteger.One <<< 224) + (BigInteger.One <<< 192) + (BigInteger.One <<< 96) - BigInteger.One
+
+    /// Solinas reduction modulo the NIST P-256 prime p = 2^256 - 2^224 + 2^192 + 2^96 - 1 for 0 <= A < p^2
+    /// per FIPS 186-4 Appendix D.2.3: B = T + 2*S1 + 2*S2 + S3 + S4 - D1 - D2 - D3 - D4 brought into 0 .. p - 1.
+    /// Second reduction checked against modPos; no constant-time claim is made.
+    let reduceP256 (aInit: BigInteger) : BigInteger =
+        let p = nistP256Prime
+        if aInit < BigInteger.Zero || aInit >= p * p then
+            raise (ArgumentOutOfRangeException(nameof aInit, "Input must satisfy 0 <= A < p^2"))
+        let mask32 = (BigInteger.One <<< 32) - BigInteger.One
+        let a = Array.init 16 (fun i -> (aInit >>> (32 * i)) &&& mask32)
+        let pack8 w7 w6 w5 w4 w3 w2 w1 w0 =
+            (w7 <<< 224) + (w6 <<< 192) + (w5 <<< 160) + (w4 <<< 128) +
+            (w3 <<< 96)  + (w2 <<< 64)  + (w1 <<< 32)  + w0
+
+        let z = BigInteger.Zero
+        let t  = pack8 a.[7]  a.[6]  a.[5]  a.[4]  a.[3]  a.[2]  a.[1]  a.[0]
+        let s1 = pack8 a.[15] a.[14] a.[13] a.[12] a.[11] z      z      z
+        let s2 = pack8 z      a.[15] a.[14] a.[13] a.[12] z      z      z
+        let s3 = pack8 a.[15] a.[14] z      z      z      a.[10] a.[9]  a.[8]
+        let s4 = pack8 a.[8]  a.[13] a.[15] a.[14] a.[13] a.[11] a.[10] a.[9]
+        let d1 = pack8 a.[10] a.[8]  z      z      z      a.[13] a.[12] a.[11]
+        let d2 = pack8 a.[11] a.[9]  z      z      a.[15] a.[14] a.[13] a.[12]
+        let d3 = pack8 a.[12] z      a.[10] a.[9]  a.[8]  a.[15] a.[14] a.[13]
+        let d4 = pack8 a.[13] z      a.[11] a.[10] a.[9]  z      a.[15] a.[14]
+
+        let mutable b = t + 2I * s1 + 2I * s2 + s3 + s4 - d1 - d2 - d3 - d4
+        while b < BigInteger.Zero do
+            b <- b + p
+        while b >= p do
+            b <- b - p
+        b

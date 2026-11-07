@@ -1,6 +1,7 @@
 namespace Arcanum.Tests
 
 open System
+open System.Globalization
 open System.Numerics
 open Xunit
 open Arcanum.Core
@@ -101,3 +102,36 @@ module ModularLawsTests =
         Assert.Equal(1I, Modular.reduceSecp256k1 ((p - 1I) * (p - 1I)))
         Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceSecp256k1 (p * p) |> ignore) |> ignore
         Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceSecp256k1 -1I |> ignore) |> ignore
+
+    [<Fact>]
+    let ``Phase 103 - FIPS 186-4 D.2.3 reduction modulo the P-256 prime`` () =
+        let p = EllipticCurve.nistP256.P
+        Assert.Equal(p, Modular.nistP256Prime)
+        let gx, gy =
+            match EllipticCurve.nistP256.G with
+            | EllipticCurve.Point(x, y) -> x, y
+            | EllipticCurve.Infinity -> failwith "Unexpected Infinity"
+
+        let two256 = BigInteger.One <<< 256
+        let candidates = [
+            0I
+            1I
+            p - 1I
+            p
+            two256 - 1I
+            two256
+            (p - 1I) * (p - 1I)
+            gx * gy
+            gx * gx
+            p * p - 1I
+        ]
+        for x in candidates do
+            Assert.Equal(Modular.modPos x p, Modular.reduceP256 x)
+
+        let expectedTwo256 = (BigInteger.One <<< 224) - (BigInteger.One <<< 192) - (BigInteger.One <<< 96) + BigInteger.One
+        let expectedTwo256Hex = BigInteger.Parse("0fffffffeffffffffffffffffffffffff000000000000000000000001", NumberStyles.HexNumber)
+        Assert.Equal(expectedTwo256Hex, expectedTwo256)
+        Assert.Equal(expectedTwo256, Modular.reduceP256 two256)
+        Assert.Equal(1I, Modular.reduceP256 ((p - 1I) * (p - 1I)))
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceP256 (p * p) |> ignore) |> ignore
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceP256 -1I |> ignore) |> ignore
