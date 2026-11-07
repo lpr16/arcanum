@@ -59,7 +59,13 @@ module DiffieHellman =
     let computeEcdhSharedSecret (curve: EllipticCurve.Curve) (myPrivateKey: BigInteger) (otherPublicKey: EllipticCurve.ECPoint) : EllipticCurve.ECPoint =
         EllipticCurve.scalarMultiply curve myPrivateKey otherPublicKey
 
-    /// Validates otherPublicKey with EllipticCurve.validatePublicKey before computing S = myPrivateKey * otherPublicKey.
+    /// Validates otherPublicKey with EllipticCurve.validatePublicKey before computing S = myPrivateKey * otherPublicKey,
+    /// and refuses S = Infinity per SEC 1 section 3.3.1 step 2.
     let computeEcdhSharedSecretChecked (curve: EllipticCurve.Curve) (myPrivateKey: BigInteger) (otherPublicKey: EllipticCurve.ECPoint) : Result<EllipticCurve.ECPoint, CryptoError> =
-        EllipticCurve.validatePublicKey curve otherPublicKey
-        |> Result.map (fun () -> EllipticCurve.scalarMultiply curve myPrivateKey otherPublicKey)
+        match EllipticCurve.validatePublicKey curve otherPublicKey with
+        | Error err -> Error err
+        | Ok () ->
+            // SEC 1 section 3.3.1 step 2: check that P = d_U * Q_V is not the point at infinity.
+            match EllipticCurve.scalarMultiply curve myPrivateKey otherPublicKey with
+            | EllipticCurve.Infinity -> Error (CorruptedState "SEC 1 section 3.3.1 step 2: shared point is the point at infinity")
+            | pt -> Ok pt

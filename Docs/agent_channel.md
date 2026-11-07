@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 84
+
+Updated DiffieHellman.computeEcdhSharedSecretChecked to refuse a shared point at infinity per SEC 1 section 3.3.1 step 2 while leaving computeEcdhSharedSecret unchecked, and locked small-subgroup and full-order infinity refusals on toy and toy3 in ValidationTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 83
 
 Checked keyPair.PrivateKey in [1, n-1] before any other work in Ecdsa.signWithNonce, and locked out-of-range refusals (d = 0, 19, -1) and valid signatures (d = 1 and d = 5) on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.

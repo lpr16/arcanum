@@ -86,3 +86,28 @@ module ValidationTests =
         for d in 1I .. 17I do
             let shared = DiffieHellman.computeEcdhSharedSecret curve d smallOrderPt
             Assert.Equal(Some (d % 3I), DiscreteLog.bruteForce curve smallOrderPt shared)
+
+    [<Fact>]
+    let ``Phase 84 - computeEcdhSharedSecretChecked refuses the point at infinity per SEC 1 section 3.3.1 step 2`` () =
+        let curve = EllipticCurve.toy
+        let smallOrderPt = EllipticCurve.Point(0I, 1I)
+        Assert.Equal(Ok (), EllipticCurve.validatePublicKey curve smallOrderPt)
+
+        for d in [ 3I; 6I; 9I; 12I; 15I ] do
+            match DiffieHellman.computeEcdhSharedSecretChecked curve d smallOrderPt with
+            | Error _ -> ()
+            | Ok _ -> Assert.Fail(sprintf "Expected computeEcdhSharedSecretChecked to refuse Infinity for d = %A" d)
+
+        for d in [ 1I; 2I; 4I; 5I; 7I; 8I; 10I; 11I; 13I; 14I; 16I; 17I ] do
+            let expected =
+                if d % 3I = 1I then EllipticCurve.Point(0I, 1I)
+                else EllipticCurve.Point(0I, 16I)
+            Assert.Equal(Ok expected, DiffieHellman.computeEcdhSharedSecretChecked curve d smallOrderPt)
+
+        match DiffieHellman.computeEcdhSharedSecretChecked curve 18I curve.G with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected 18 * G = Infinity on toy to be refused")
+
+        match DiffieHellman.computeEcdhSharedSecretChecked EllipticCurve.toy3 19I EllipticCurve.toy3.G with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected 19 * G = Infinity on toy3 to be refused")
