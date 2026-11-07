@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 108
+
+Added EllipticCurve.naf in EllipticCurve.fs and locked non-adjacent form examples and laws across 0 .. 2000 in NafTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 107
 
 Locked ECDH agreement and non-Infinity checked shared secrets across all 324 private-key pairs (d1, d2) in 1 .. 18 on prime-order toy3 in ToyEcdhTests.fs. `dotnet test --configuration Release` passed.

@@ -168,6 +168,22 @@ module EllipticCurve =
 
             res
 
+    /// Non-adjacent form (NAF) of a non-negative integer, least significant digit first, with digits in {-1, 0, 1}.
+    let naf (kInit: BigInteger) : int list =
+        if kInit < BigInteger.Zero then
+            raise (ArgumentOutOfRangeException(nameof kInit, "Scalar must be non-negative"))
+        let mutable k = kInit
+        let mutable digits = []
+        while k > BigInteger.Zero do
+            let d =
+                if (k &&& BigInteger.One) = BigInteger.One then
+                    2 - int (k % 4I)
+                else
+                    0
+            digits <- d :: digits
+            k <- (k - BigInteger d) / 2I
+        List.rev digits
+
     /// Public-key validation per SEC 1 section 3.2.2.1.
     /// Refuses Infinity, refuses a point that fails isOnCurve (including the 0 .. P - 1 coordinate range),
     /// and refuses a point with multiplyUnreduced curve curve.N Q <> Infinity.
