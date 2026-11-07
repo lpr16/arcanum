@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 97
+
+Locked the second PBKDF2-HMAC-SHA256 vector of RFC 7914 section 11 (`"Password"`, `"NaCl"`, `c = 80000`, `dkLen = 64`) in Pbkdf2Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 96
 
 Locked RFC 4231 sections 4.7 and 4.8 (test cases 6 and 7 with 131-byte keys exceeding the 64-byte SHA-256 block size) through HMAC.hmacSha256 in HmacTests.fs. `dotnet test --configuration Release` passed.
