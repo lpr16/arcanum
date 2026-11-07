@@ -105,3 +105,42 @@ module Rfc6979Tests =
             Assert.False(Ecdsa.verify curve u msgTest sigSample)
         | _ ->
             Assert.Fail("Expected RFC 6979 signatures for sample and test to succeed")
+
+    [<Fact>]
+    let ``Phase 120 - Recovering the RFC 6979 section A.2.5 public key on NIST P-256`` () =
+        let curve = EllipticCurve.nistP256
+        let u =
+            EllipticCurve.Point(
+                hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        let msgSample = Encoding.ASCII.GetBytes("sample")
+        let msgTest = Encoding.ASCII.GetBytes("test")
+
+        let sigSample : EcdsaSignature = {
+            R = hexInt "EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716"
+            S = hexInt "F7CB1C942D657C41D436C7A1B6E29F65F3E900DBB9AFF4064DC4AB2F843ACDA8"
+        }
+        let sigTest : EcdsaSignature = {
+            R = hexInt "F1ABB023518351CD71D881567B1EA663ED3EFCF6C5132B354F28D3B0B7D38367"
+            S = hexInt "019F4113742A2B14BD25926B49C649155F267E60D3814B4C0CC84250E46F0083"
+        }
+
+        let uSampleOther =
+            EllipticCurve.Point(
+                hexInt "7f57fdb5eca3f088decb4937710c709185bd17ff938fc41cfd424249db4a2c3e",
+                hexInt "58b68842e9cfeb1b1c648966cba4e790b3ce16d067184136f67b8bb3fbd5ba36")
+        let uTestOther =
+            EllipticCurve.Point(
+                hexInt "811406049e3599d8d8747bbd9b6b3b7b0e9e46a65af69c23eba08c626dcd5693",
+                hexInt "6a4b877c3a3a9d4b9ee9b7b74d20bf232134139e0770a4e0f20fd62a49258a3c")
+
+        let recSample = Ecdsa.recoverPublicKeys curve msgSample sigSample
+        let recTest = Ecdsa.recoverPublicKeys curve msgTest sigTest
+
+        Assert.Equal<EllipticCurve.ECPoint list>([ u; uSampleOther ], recSample)
+        Assert.Equal<EllipticCurve.ECPoint list>([ u; uTestOther ], recTest)
+
+        for q in recSample do
+            Assert.True(Ecdsa.verify curve q msgSample sigSample)
+        for q in recTest do
+            Assert.True(Ecdsa.verify curve q msgTest sigTest)
