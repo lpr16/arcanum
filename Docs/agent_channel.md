@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 128
+
+Updated README.md to document the inclusive randomBigInteger, exact RSA modulus bit length, ECDSA private-key range, Infinity refusal in computeEcdhSharedSecretChecked, constantTimeEquals and the absence of constant-time claims across the repository, millerRabinWithBases, lucasCertificate, batchInverse, reduceSecp256k1, reduceP256, DiscreteLog.order, order histograms, toy2 as Z/4 x Z/4, pollardRho and kangaroo on toy curves, naf, wnaf, scalarMultiplyNaf, scalarMultiplyWnaf, multiScalarMultiply, Jacobian.addMixed, Jacobian.scalarMultiply, doubleAMinus3, batchToAffine, the secp256k1 endomorphism check, recoverPublicKeys, signature malleability, related-nonce recovery, Shamir.shareWith and reconstructMany, Hill, Transposition, and the cited checks from FIPS 197 Appendices A.1 and B, SP 800-38A F.1.1/F.2.1/F.5.1/F.5.2, RFC 8439, RFC 4231 test cases 3 through 7, and RFC 7914 section 11. Confirmed Docs/agent_channel.md has one entry for each phase from 80 through 128 and that all entries from phases 0 through 79 remain intact and unedited. `dotnet test --configuration Release` passed. The depth program is complete.
+
 ### 2026-11-07 - Antigravity - Phase 127
 
 Added Transposition.railFenceEncrypt and Transposition.railFenceDecrypt in Transposition.fs and locked rail fence laws for 2, 3, 4, and 25 rails and 1-rail refusal in ClassicalLawsTests.fs. `dotnet test --configuration Release` passed.
