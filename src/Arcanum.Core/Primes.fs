@@ -23,23 +23,31 @@ module Primes =
             elif isDivisible then Some false
             else None
 
-    /// Generates a random BigInteger in the range [min, max] using the CLR RandomNumberGenerator.Fill.
+    /// Generates a random BigInteger in the inclusive range [minVal, maxVal] (both ends included)
+    /// using the CLR RandomNumberGenerator.Fill call.
     let randomBigInteger (minVal: BigInteger) (maxVal: BigInteger) : BigInteger =
-        if minVal >= maxVal then
-            raise (ArgumentException("minVal must be strictly less than maxVal"))
-        let range = maxVal - minVal
-        let bytesNeeded = range.ToByteArray().Length
-        let buffer: byte[] = Array.zeroCreate (bytesNeeded + 1) // +1 ensures positive sign
+        if minVal > maxVal then
+            raise (ArgumentException("minVal must be less than or equal to maxVal"))
+        elif minVal = maxVal then
+            minVal
+        else
+            let range = maxVal - minVal
+            let bitLen = int (range.GetBitLength())
+            let bytesNeeded = (bitLen + 7) / 8
+            let topByteBits = bitLen % 8
+            let buffer: byte[] = Array.zeroCreate bytesNeeded
 
-        let rec loop () =
-            RandomNumberGenerator.Fill(Span<byte>(buffer))
-            buffer.[buffer.Length - 1] <- 0uy // enforce positive
-            let candidate = BigInteger(ReadOnlySpan<byte>(buffer))
-            if candidate < range then
-                minVal + candidate
-            else
-                loop ()
-        loop ()
+            let rec loop () =
+                RandomNumberGenerator.Fill(Span<byte>(buffer))
+                if topByteBits > 0 then
+                    let mask = (1uy <<< topByteBits) - 1uy
+                    buffer.[bytesNeeded - 1] <- buffer.[bytesNeeded - 1] &&& mask
+                let candidate = BigInteger(ReadOnlySpan<byte>(buffer), isUnsigned = true, isBigEndian = false)
+                if candidate <= range then
+                    minVal + candidate
+                else
+                    loop ()
+            loop ()
 
     /// Miller-Rabin probabilistic primality test with specified number of rounds.
     /// Draws random bases using RandomNumberGenerator.Fill. This is a probabilistic test, not a deterministic primality proof.
