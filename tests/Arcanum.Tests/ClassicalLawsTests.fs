@@ -71,4 +71,21 @@ module ClassicalLawsTests =
             Assert.True(Result.isError (Hill.encrypt key badText))
             Assert.True(Result.isError (Hill.decrypt key badText))
 
+    [<Fact>]
+    let ``Phase 127 - Rail fence encryption, decryption, and 1-rail refusal`` () =
+        let text = "WEAREDISCOVEREDFLEEATONCE"
+        Assert.Equal(Ok "WECRLTEERDSOEEFEAOCAIVDEN", Transposition.railFenceEncrypt 3 text)
+        Assert.Equal(Ok "WAEICVRDLETNEERDSOEEFEAOC", Transposition.railFenceEncrypt 2 text)
+        Assert.Equal(Ok "WIREEEDSEEEACAECVDLTNROFO", Transposition.railFenceEncrypt 4 text)
+
+        Assert.Equal(Ok text, Transposition.railFenceDecrypt 3 "WECRLTEERDSOEEFEAOCAIVDEN")
+        Assert.Equal(Ok text, Transposition.railFenceDecrypt 2 "WAEICVRDLETNEERDSOEEFEAOC")
+        Assert.Equal(Ok text, Transposition.railFenceDecrypt 4 "WIREEEDSEEEACAECVDLTNROFO")
+
+        Assert.Equal(Ok text, Transposition.railFenceEncrypt 25 text)
+        Assert.Equal(Ok text, Transposition.railFenceDecrypt 25 text)
+
+        Assert.True(Result.isError (Transposition.railFenceEncrypt 1 text))
+        Assert.True(Result.isError (Transposition.railFenceDecrypt 1 text))
+
 

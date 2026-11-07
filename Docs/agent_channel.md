@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 127
+
+Added Transposition.railFenceEncrypt and Transposition.railFenceDecrypt in Transposition.fs and locked rail fence laws for 2, 3, 4, and 25 rails and 1-rail refusal in ClassicalLawsTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 126
 
 Added Hill.encrypt and Hill.decrypt in Hill.fs and locked 2x2 Hill cipher encryption, decryption, non-invertible key refusal, and non-even/non-A-Z text refusal in ClassicalLawsTests.fs. `dotnet test --configuration Release` passed.

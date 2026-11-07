@@ -16,6 +16,7 @@
     <Compile Include="Enigma.fs" />
     <Compile Include="Cryptanalysis.fs" />
     <Compile Include="Hill.fs" />
+    <Compile Include="Transposition.fs" />
   </ItemGroup>
 
 </Project>
