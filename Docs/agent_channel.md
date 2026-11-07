@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 122
+
+Locked closed-form recovery of private key d = 5 and nonce k1 = 4 from affine-related nonces k2 = 2 * k1 + 3 on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 121
 
 Locked ECDSA signature malleability (r, N - s) on the NIST P-256 RFC 6979 vectors in Rfc6979Tests.fs and on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.

@@ -295,3 +295,54 @@ module ToyEcdsaTests =
         Assert.Equal({ R = 3I; S = 5I }, malleableSig)
         Assert.True(Ecdsa.verify curve pub msgEc malleableSig)
         Assert.Equal(Ok malleableSig, Ecdsa.signWithNonce keyPair msgEc 15I)
+
+    [<Fact>]
+    let ``Phase 122 - Related nonces k2 = a*k1 + b on toy3 expose private key and nonces`` () =
+        let curve = EllipticCurve.toy3
+        let n = curve.N
+        let d = 5I
+        let a = 2I
+        let b = 3I
+        let k1 = 4I
+        let k2 = a * k1 + b
+        Assert.Equal(11I, k2)
+
+        let pub = EllipticCurve.Point(9I, 16I)
+        let keyPair: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = d
+            PublicKey = pub
+            Curve = curve
+        }
+
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let msgEx = Encoding.ASCII.GetBytes("ex")
+        let e1 = Ecdsa.messageRepresentative curve msgEc
+        let e2 = Ecdsa.messageRepresentative curve msgEx
+        Assert.Equal(3I, e1)
+        Assert.Equal(10I, e2)
+        Assert.Equal(EllipticCurve.Point(13I, 10I), repeatedAdd curve 11 curve.G)
+
+        match Ecdsa.signWithNonce keyPair msgEc k1, Ecdsa.signWithNonce keyPair msgEx k2 with
+        | Ok sig1, Ok sig2 ->
+            Assert.Equal({ R = 3I; S = 14I }, sig1)
+            Assert.Equal({ R = 13I; S = 12I }, sig2)
+            let r1, s1 = sig1.R, sig1.S
+            let r2, s2 = sig2.R, sig2.S
+
+            match Modular.modInverse s1 n with
+            | Some s1Inv ->
+                Assert.Equal(15I, s1Inv)
+                let num = Modular.modPos (e2 - s2 * b - s2 * a * e1 * s1Inv) n
+                let den = Modular.modPos (s2 * a * r1 * s1Inv - r2) n
+                Assert.Equal(15I, num)
+                Assert.Equal(3I, den)
+                match Modular.modInverse den n with
+                | Some denInv ->
+                    Assert.Equal(13I, denInv)
+                    let recoveredD = Modular.modPos (num * denInv) n
+                    let recoveredK1 = Modular.modPos ((e1 + r1 * recoveredD) * s1Inv) n
+                    Assert.Equal(5I, recoveredD)
+                    Assert.Equal(4I, recoveredK1)
+                | None -> Assert.Fail("Expected denominator to be invertible modulo 19")
+            | None -> Assert.Fail("Expected s1 to be invertible modulo 19")
+        | _ -> Assert.Fail("Expected both signatures to succeed")
