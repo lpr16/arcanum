@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 107
+
+Locked ECDH agreement and non-Infinity checked shared secrets across all 324 private-key pairs (d1, d2) in 1 .. 18 on prime-order toy3 in ToyEcdhTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 106
 
 Locked SEC 1 compressed and uncompressed encodePoint/decodePoint round-trip, length, and injectivity across all points of toy (18), toy2 (16), and toy3 (19) in Sec1Tests.fs. `dotnet test --configuration Release` passed.

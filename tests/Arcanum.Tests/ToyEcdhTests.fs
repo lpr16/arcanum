@@ -32,3 +32,19 @@ module ToyEcdhTests =
             [ 1 .. 15 ]
             |> List.fold (fun acc _ -> EllipticCurve.add curve acc curve.G) EllipticCurve.Infinity
         Assert.Equal(repeatedAdd, sharedA)
+
+    [<Fact>]
+    let ``Phase 107 - ECDH agreement on every pair of private keys on prime-order toy3`` () =
+        let curve = EllipticCurve.toy3
+        for d1 in 1I .. 18I do
+            let pub1 = EllipticCurve.scalarMultiply curve d1 curve.G
+            for d2 in 1I .. 18I do
+                let pub2 = EllipticCurve.scalarMultiply curve d2 curve.G
+                let s1 = DiffieHellman.computeEcdhSharedSecret curve d1 pub2
+                let s2 = DiffieHellman.computeEcdhSharedSecret curve d2 pub1
+                let expected = EllipticCurve.scalarMultiply curve (Modular.modPos (d1 * d2) 19I) curve.G
+                Assert.NotEqual(EllipticCurve.Infinity, expected)
+                Assert.Equal(expected, s1)
+                Assert.Equal(expected, s2)
+                Assert.Equal(Ok expected, DiffieHellman.computeEcdhSharedSecretChecked curve d1 pub2)
+                Assert.Equal(Ok expected, DiffieHellman.computeEcdhSharedSecretChecked curve d2 pub1)
