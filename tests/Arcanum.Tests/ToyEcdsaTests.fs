@@ -170,3 +170,14 @@ module ToyEcdsaTests =
             Curve = curve
         }
         Assert.Equal(Ok { R = 3I; S = 14I }, Ecdsa.signWithNonce key5 msgEc k)
+
+    [<Fact>]
+    let ``Phase 112 - ECDSA verify via multiScalarMultiply on toy3`` () =
+        let curve = EllipticCurve.toy3
+        let pub = EllipticCurve.Point(9I, 16I)
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let msgEx = Encoding.ASCII.GetBytes("ex")
+
+        Assert.True(Ecdsa.verify curve pub msgEc { R = 3I; S = 14I })
+        Assert.True(Ecdsa.verify curve pub msgEx { R = 3I; S = 11I })
+        Assert.False(Ecdsa.verify curve pub msgEx { R = 3I; S = 14I })

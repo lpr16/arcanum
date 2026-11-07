@@ -82,9 +82,7 @@ module Ecdsa =
                 let u1 = Modular.modPos (z * w) curve.N
                 let u2 = Modular.modPos (sigVal.R * w) curve.N
 
-                let p1 = EllipticCurve.scalarMultiply curve u1 curve.G
-                let p2 = EllipticCurve.scalarMultiply curve u2 pubKey
-                let pt = EllipticCurve.add curve p1 p2
+                let pt = EllipticCurve.multiScalarMultiply curve u1 curve.G u2 pubKey
 
                 match pt with
                 | EllipticCurve.Infinity -> false
