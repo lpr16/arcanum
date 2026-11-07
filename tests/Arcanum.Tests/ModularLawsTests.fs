@@ -1,5 +1,6 @@
 namespace Arcanum.Tests
 
+open System
 open System.Numerics
 open Xunit
 open Arcanum.Core
@@ -69,3 +70,34 @@ module ModularLawsTests =
         Assert.Equal(Ok ([] : BigInteger list), Modular.batchInverse [] 17I)
         Assert.True(Result.isError (Modular.batchInverse [ 3I; 0I; 5I ] 17I))
         Assert.True(Result.isError (Modular.batchInverse [ 3I; 17I ] 17I))
+
+    [<Fact>]
+    let ``Phase 102 - Special-form reduction modulo the secp256k1 prime`` () =
+        let p = EllipticCurve.secp256k1.P
+        Assert.Equal(p, Modular.secp256k1Prime)
+        let gx, gy =
+            match EllipticCurve.secp256k1.G with
+            | EllipticCurve.Point(x, y) -> x, y
+            | EllipticCurve.Infinity -> failwith "Unexpected Infinity"
+
+        let two256 = BigInteger.One <<< 256
+        let candidates = [
+            0I
+            1I
+            p - 1I
+            p
+            p + 1I
+            two256 - 1I
+            two256
+            (p - 1I) * (p - 1I)
+            gx * gy
+            gx * gx
+            p * p - 1I
+        ]
+        for x in candidates do
+            Assert.Equal(Modular.modPos x p, Modular.reduceSecp256k1 x)
+
+        Assert.Equal(4294968273I, Modular.reduceSecp256k1 two256)
+        Assert.Equal(1I, Modular.reduceSecp256k1 ((p - 1I) * (p - 1I)))
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceSecp256k1 (p * p) |> ignore) |> ignore
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> Modular.reduceSecp256k1 -1I |> ignore) |> ignore

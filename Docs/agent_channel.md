@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 102
+
+Added Modular.reduceSecp256k1 in Modular.fs and locked agreement with modPos on [0, p^2 - 1] and out-of-range rejection in ModularLawsTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 101
 
 Added Modular.batchInverse (Montgomery's trick with a single modInverse call) in Modular.fs and locked F_17 inversions, empty list, and non-invertible refusals in ModularLawsTests.fs. `dotnet test --configuration Release` passed.

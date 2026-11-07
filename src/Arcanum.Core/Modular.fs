@@ -176,3 +176,25 @@ module Modular =
                     accInv <- modPos (accInv * arr.[i]) m
                 invs.[0] <- accInv
                 Ok (Array.toList invs)
+
+    /// The secp256k1 field prime 2^256 - 2^32 - 977.
+    let secp256k1Prime : BigInteger = (BigInteger.One <<< 256) - (BigInteger.One <<< 32) - 977I
+
+    /// Special-form reduction modulo the secp256k1 prime p = 2^256 - 2^32 - 977 for 0 <= x < p^2,
+    /// using 2^256 = 2^32 + 977 = 4294968273 (mod p).
+    /// This is a second reduction checked against modPos; no constant-time claim is made.
+    let reduceSecp256k1 (xInit: BigInteger) : BigInteger =
+        let p = secp256k1Prime
+        if xInit < BigInteger.Zero || xInit >= p * p then
+            raise (ArgumentOutOfRangeException(nameof xInit, "Input must satisfy 0 <= x < p^2"))
+        let two256 = BigInteger.One <<< 256
+        let mask256 = two256 - BigInteger.One
+        let c = (BigInteger.One <<< 32) + 977I
+        let mutable x = xInit
+        while x >= two256 do
+            let h = x >>> 256
+            let l = x &&& mask256
+            x <- h * c + l
+        while x >= p do
+            x <- x - p
+        x
