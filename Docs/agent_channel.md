@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 118
+
+Locked the full nonce sweep k in 1 .. 18 on toy3 for d = 5 on "ec" (14 signatures and 4 refusals at k in {7, 9, 10, 12}) and on "ex" (2 refusals at k in {7, 12}) in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 117
 
 Locked the secp256k1 endomorphism cube roots beta mod p and lambda mod N and verified lambda * Q = (beta * x, y) on G and 2G and lambda^2 * G = (beta^2 * Gx, Gy) in Secp256k1Tests.fs. `dotnet test --configuration Release` passed.

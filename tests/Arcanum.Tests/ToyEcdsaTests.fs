@@ -181,3 +181,53 @@ module ToyEcdsaTests =
         Assert.True(Ecdsa.verify curve pub msgEc { R = 3I; S = 14I })
         Assert.True(Ecdsa.verify curve pub msgEx { R = 3I; S = 11I })
         Assert.False(Ecdsa.verify curve pub msgEx { R = 3I; S = 14I })
+
+    [<Fact>]
+    let ``Phase 118 - Every nonce on toy3 for ec and ex`` () =
+        let curve = EllipticCurve.toy3
+        let pub = EllipticCurve.Point(9I, 16I)
+        let keyPair: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 5I
+            PublicKey = pub
+            Curve = curve
+        }
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let msgEx = Encoding.ASCII.GetBytes("ex")
+
+        let expectedEc =
+            Map.ofList [
+                1I, (5I, 9I)
+                2I, (6I, 7I)
+                3I, (10I, 5I)
+                4I, (3I, 14I)
+                5I, (9I, 2I)
+                6I, (16I, 17I)
+                8I, (13I, 18I)
+                11I, (13I, 1I)
+                13I, (16I, 2I)
+                14I, (9I, 17I)
+                15I, (3I, 5I)
+                16I, (10I, 14I)
+                17I, (6I, 12I)
+                18I, (5I, 10I)
+            ]
+
+        let mutable failedEc = []
+        for k in 1I .. 18I do
+            match Ecdsa.signWithNonce keyPair msgEc k with
+            | Error _ ->
+                failedEc <- failedEc @ [ k ]
+            | Ok sigVal ->
+                Assert.True(Map.containsKey k expectedEc)
+                let expR, expS = expectedEc.[k]
+                Assert.Equal({ R = expR; S = expS }, sigVal)
+                Assert.True(Ecdsa.verify curve pub msgEc sigVal)
+
+        Assert.Equal<BigInteger list>([ 7I; 9I; 10I; 12I ], failedEc)
+
+        let refusedEx =
+            [ for k in 1I .. 18I do
+                match Ecdsa.signWithNonce keyPair msgEx k with
+                | Error _ -> yield k
+                | Ok sigVal -> Assert.True(Ecdsa.verify curve pub msgEx sigVal) ]
+        Assert.Equal<BigInteger list>([ 7I; 12I ], refusedEx)
