@@ -40,6 +40,7 @@
     <Compile Include="Rfc5903Tests.fs" />
     <Compile Include="BytesTests.fs" />
     <Compile Include="Sp80038aTests.fs" />
+    <Compile Include="AeadTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
