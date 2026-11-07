@@ -30,3 +30,21 @@ module HmacTests =
         let expected5First16 = Bytes.fromHex "a3b6167473100ee06e0c796c2955552b"
         let tag5 = HMAC.hmacSha256 key5 data5
         Assert.Equal<byte>(expected5First16, tag5.Value.[0 .. 15])
+
+    [<Fact>]
+    let ``Phase 96 - HMAC-SHA256 matches RFC 4231 sections 4.7 and 4.8 (test cases 6 and 7, key > blockSize)`` () =
+        let key131 = Key (Array.create 131 0xaauy)
+
+        // Test case 6 (RFC 4231 section 4.7)
+        let data6 = Encoding.ASCII.GetBytes("Test Using Larger Than Block-Size Key - Hash Key First")
+        Assert.Equal(54, data6.Length)
+        let expected6 = Bytes.fromHex "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54"
+        Assert.Equal<byte>(expected6, (HMAC.hmacSha256 key131 data6).Value)
+
+        // Test case 7 (RFC 4231 section 4.8)
+        let data7 =
+            Encoding.ASCII.GetBytes(
+                "This is a test using a larger than block-size key and a larger than block-size data. The key needs to be hashed before being used by the HMAC algorithm.")
+        Assert.Equal(152, data7.Length)
+        let expected7 = Bytes.fromHex "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2"
+        Assert.Equal<byte>(expected7, (HMAC.hmacSha256 key131 data7).Value)
