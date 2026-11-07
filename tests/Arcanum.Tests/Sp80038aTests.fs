@@ -55,3 +55,22 @@ module Sp80038aTests =
             | Ok dec -> Assert.Equal<byte>(sp80038aPlaintext, dec.Value)
             | Error err -> Assert.Fail(sprintf "Unexpected CBC decrypt error: %A" err)
         | Error err -> Assert.Fail(sprintf "Unexpected CBC encrypt error: %A" err)
+
+    [<Fact>]
+    let ``Phase 88 - SP 800-38A sections F.5.1 and F.5.2 CTR-AES128`` () =
+        let key = Key sp80038aKey
+        let iv = Iv (Bytes.fromHex "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff")
+        let expectedCtr =
+            Bytes.fromHex (
+                "874d6191b620e3261bef6864990db6ce" +
+                "9806f66b7970fdff8617187bb9fffdff" +
+                "5ae4df3edbd5d35e5b4f09020db03eab" +
+                "1e031dda2fbe03d1792170a0f3009cee")
+
+        match Modes.processCtr key iv sp80038aPlaintext with
+        | Ok ct ->
+            Assert.Equal<byte>(expectedCtr, ct)
+            match Modes.processCtr key iv ct with
+            | Ok pt -> Assert.Equal<byte>(sp80038aPlaintext, pt)
+            | Error err -> Assert.Fail(sprintf "Unexpected CTR decrypt error: %A" err)
+        | Error err -> Assert.Fail(sprintf "Unexpected CTR encrypt error: %A" err)
