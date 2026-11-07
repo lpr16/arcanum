@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 99
+
+Locked probable-prime checks via Primes.millerRabinWithBases on secp256k1.P, secp256k1.N, nistP256.P, and nistP256.N (and composite refusal on secp256k1.P + 2) in PrimeTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 98
 
 Added Primes.millerRabinWithBases in Primes.fs and locked Carmichael number 561, strong pseudoprime 3215031751, and 12-base checks in PrimeTests.fs. `dotnet test --configuration Release` passed.

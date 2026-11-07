@@ -56,3 +56,17 @@ module PrimeTests =
             Assert.True(Primes.millerRabinWithBases p firstTwelvePrimes)
         for c in [ 1I; 4I; 91I; 561I; 1105I; 3215031751I ] do
             Assert.False(Primes.millerRabinWithBases c firstTwelvePrimes)
+
+    [<Fact>]
+    let ``Phase 99 - secp256k1 and NIST P-256 field primes and group orders are probable primes`` () =
+        // Each value passes millerRabinWithBases as a probable prime (not a primality proof).
+        // No group enumeration or discrete logarithm is performed on secp256k1 or nistP256.
+        let firstTwelvePrimes = [ 2I; 3I; 5I; 7I; 11I; 13I; 17I; 19I; 23I; 29I; 31I; 37I ]
+        Assert.True(Primes.millerRabinWithBases EllipticCurve.secp256k1.P firstTwelvePrimes)
+        Assert.True(Primes.millerRabinWithBases EllipticCurve.secp256k1.N firstTwelvePrimes)
+        Assert.True(Primes.millerRabinWithBases EllipticCurve.nistP256.P firstTwelvePrimes)
+        Assert.True(Primes.millerRabinWithBases EllipticCurve.nistP256.N firstTwelvePrimes)
+
+        // secp256k1.P + 2 = 2^256 - 2^32 - 975 = 0 (mod 3), so millerRabinWithBases returns false.
+        Assert.Equal(0I, (EllipticCurve.secp256k1.P + 2I) % 3I)
+        Assert.False(Primes.millerRabinWithBases (EllipticCurve.secp256k1.P + 2I) firstTwelvePrimes)
