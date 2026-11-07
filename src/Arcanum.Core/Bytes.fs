@@ -4,7 +4,8 @@ open System
 open System.Security.Cryptography
 
 module Bytes =
-    /// Constant-time byte array comparison to mitigate timing side-channel attacks.
+    /// Branches on reference equality, null, and length, then accumulates the bitwise OR of XOR differences over the bytes.
+    /// No constant-time claim is made.
     let constantTimeEquals (a: byte[]) (b: byte[]) : bool =
         if obj.ReferenceEquals(a, b) then true
         elif isNull a || isNull b then false

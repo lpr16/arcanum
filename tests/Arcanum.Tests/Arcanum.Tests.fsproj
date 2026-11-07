@@ -38,6 +38,7 @@
     <Compile Include="CountingTests.fs" />
     <Compile Include="Rfc6979Tests.fs" />
     <Compile Include="Rfc5903Tests.fs" />
+    <Compile Include="BytesTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

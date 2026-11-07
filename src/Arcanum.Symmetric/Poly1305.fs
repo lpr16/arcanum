@@ -59,7 +59,8 @@ module Poly1305 =
 
         Tag tagBytes
 
-    /// Verifies a Poly1305 tag in constant time.
+    /// Verifies a Poly1305 tag by comparing the computed tag with expectedTag via Bytes.constantTimeEquals.
+    /// No constant-time claim is made.
     let verify (key: byte[]) (message: byte[]) (expectedTag: Tag) : bool =
         let computed = mac key message
         Bytes.constantTimeEquals computed.Value expectedTag.Value

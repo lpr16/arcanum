@@ -17,7 +17,8 @@ module Padding =
             padded.[i] <- padByte
         padded
 
-    /// Strips PKCS#7 padding in constant time, returning an error if padding is corrupted.
+    /// Strips PKCS#7 padding by checking length and the last byte, then looping over the last padLen bytes
+    /// accumulating the bitwise OR of (int data.[i] ^^^ padLen). No constant-time claim is made.
     let unpadPkcs7 (blockSize: int) (data: byte[]) : Result<byte[], CryptoError> =
         if data.Length = 0 || data.Length % blockSize <> 0 then
             Error InvalidPadding
@@ -26,7 +27,7 @@ module Padding =
             if padLen <= 0 || padLen > blockSize || padLen > data.Length then
                 Error InvalidPadding
             else
-                // Constant-time verification of all padding bytes
+                // Accumulate the bitwise OR of (int data.[i] ^^^ padLen) across the last padLen bytes; no constant-time claim is made.
                 let mutable diff = 0
                 for i = data.Length - padLen to data.Length - 1 do
                     diff <- diff ||| (int data.[i] ^^^ padLen)

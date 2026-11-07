@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 85
+
+Replaced constant-time claims in Bytes.fs, Padding.fs, Poly1305.fs, HMAC.fs, and ChaCha20Poly1305.fs with comments describing what the code does and stating that no constant-time claim is made, verified with a search over src/ that every remaining match for `constant time` or `constant-time` across source files (`Bytes.fs`, `EllipticCurve.fs`, `Jacobian.fs`, `HMAC.fs`, `ChaCha20Poly1305.fs`, `Padding.fs`, `Poly1305.fs`) states that no constant-time claim is made, and locked Bytes.constantTimeEquals in BytesTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 84
 
 Updated DiffieHellman.computeEcdhSharedSecretChecked to refuse a shared point at infinity per SEC 1 section 3.3.1 step 2 while leaving computeEcdhSharedSecret unchecked, and locked small-subgroup and full-order infinity refusals on toy and toy3 in ValidationTests.fs. `dotnet test --configuration Release` passed.

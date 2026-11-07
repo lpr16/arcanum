@@ -47,7 +47,7 @@ module ChaCha20Poly1305 =
                 Ok (Ciphertext cipherBytes, tag)
 
     /// Authenticated Decryption with Associated Data (AEAD) per RFC 8439.
-    /// Strict constant-time MAC verification before decryption to avoid padding and plaintext oracle leaks!
+    /// Compares the tag with Bytes.constantTimeEquals before decrypting; no constant-time claim is made.
     let decrypt (key: Key) (nonce: Nonce) (aad: byte[]) (ciphertext: Ciphertext) (tag: Tag) : Result<Plaintext, CryptoError> =
         if key.Length <> 32 then
             Error (InvalidKeyLength (32, key.Length))

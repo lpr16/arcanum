@@ -36,7 +36,8 @@ module HMAC =
 
         Tag outerHash
 
-    /// Verifies HMAC tag in constant time.
+    /// Verifies an HMAC-SHA256 tag by comparing the computed tag with expectedTag via Bytes.constantTimeEquals.
+    /// No constant-time claim is made.
     let verifySha256 (key: Key) (message: byte[]) (expectedTag: Tag) : bool =
         let computed = hmacSha256 key message
         Bytes.constantTimeEquals computed.Value expectedTag.Value
