@@ -133,3 +133,21 @@ module Jacobian =
                     let y3 = Modular.modPos (r * (u1hSq - x3) - s1 * hCube) p
                     let z3 = Modular.modPos (h * z1) p
                     { X = x3; Y = y3; Z = z3 }
+
+    /// Scalar multiplication in Jacobian coordinates: reduces k modulo N, walks the bits of k
+    /// from the top with Jacobian.double and Jacobian.addMixed of the affine input, and converts
+    /// to affine once at the end with toAffine. No constant-time claim is made.
+    let scalarMultiply (curve: EllipticCurve.Curve) (k: BigInteger) (pt: EllipticCurve.ECPoint) : EllipticCurve.ECPoint =
+        let s = Modular.modPos k curve.N
+        if s = BigInteger.Zero || pt = EllipticCurve.Infinity then
+            EllipticCurve.Infinity
+        else
+            let rec bits acc n =
+                if n = BigInteger.Zero then acc
+                else bits (int (n &&& BigInteger.One) :: acc) (n >>> 1)
+            let mutable acc = ofAffine EllipticCurve.Infinity
+            for b in bits [] s do
+                acc <- double curve acc
+                if b = 1 then
+                    acc <- addMixed curve acc pt
+            toAffine curve acc

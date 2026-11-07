@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 114
+
+Added Jacobian.scalarMultiply in Jacobian.fs and locked agreement across all points and scalars on toy, toy2, and toy3, RFC 5903 section 8.1 points on NIST P-256, and 2G on secp256k1 in JacobianTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 113
 
 Added Jacobian.addMixed in Jacobian.fs and locked mixed Jacobian-affine addition across all point pairs on toy, toy2, and toy3 in JacobianTests.fs. `dotnet test --configuration Release` passed.
