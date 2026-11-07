@@ -67,7 +67,9 @@ module DiscreteLog =
                         giantLoop (i + BigInteger.One) (EllipticCurve.add curve gamma negMBase)
             giantLoop BigInteger.Zero target
 
-    let private pointOrderByRepeatedAdd (curve: EllipticCurve.Curve) (pt: EllipticCurve.ECPoint) : BigInteger =
+    /// Adds a point to itself step by step until it reaches Infinity (returning 1 for Infinity).
+    /// This function is for the small toy curves (toy, toy2, and toy3) only.
+    let order (curve: EllipticCurve.Curve) (pt: EllipticCurve.ECPoint) : BigInteger =
         if pt = EllipticCurve.Infinity then
             BigInteger.One
         else
@@ -93,7 +95,7 @@ module DiscreteLog =
             let n =
                 factors
                 |> List.fold (fun acc (q, e) -> acc * BigInteger.Pow(q, e)) BigInteger.One
-            let actualOrder = pointOrderByRepeatedAdd curve basePt
+            let actualOrder = order curve basePt
             if n <> actualOrder then
                 Error (ParameterOutOfRange "Factorization product does not equal the order of the base point")
             else
