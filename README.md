@@ -4,7 +4,7 @@
 
 Arcanum is a cryptography research study. Its center is the group of points on a short Weierstrass curve over a prime field. The group law is `EllipticCurve.add`, and scalar multiplication is repeated addition. Around that center, the study locks exact constructions a reader can check: modular arithmetic, binary fields, cited checks of existing symmetric code, textbook public-key arithmetic, historical letter ciphers, and one integer lattice.
 
-The project targets F# on .NET 10. It is an educational and research codebase, not a production cryptography library. The work orders are `Docs/antigravity_work_program.md` (phases 0 through 8), `Docs/antigravity_research_program.md` (phases 9 through 48), and `Docs/antigravity_long_haul_program.md` (phases 49 through 79). `Docs/agent_channel.md` records each phase.
+The project targets F# on .NET 10. It is an educational and research codebase, not a production cryptography library. The work orders are `Docs/antigravity_work_program.md` (phases 0 through 8), `Docs/antigravity_research_program.md` (phases 9 through 48), `Docs/antigravity_long_haul_program.md` (phases 49 through 79), and `Docs/antigravity_depth_program.md` (phases 80 through 128). `Docs/agent_channel.md` records each phase.
 
 ## Coordinate field and elliptic-curve group
 

@@ -4,6 +4,14 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 80
+
+Committed Docs/antigravity_depth_program.md, the announcing channel entry, and added Docs/antigravity_depth_program.md (phases 80 through 128) to the work order sentence in README.md. `dotnet test --configuration Release` passed.
+
+### 2026-11-07 - Claude Code
+
+The long-haul program ended at phase 79 on `main`. The next work order is `Docs/antigravity_depth_program.md`, phases 80 through 128. It is not started. It stays inside the current `AGENTS.md` charter and adds no curve, hash, cipher, or key size. It repairs five defects found by reading the code, locks the existing symmetric code against FIPS 197, SP 800-38A, RFC 8439, RFC 4231, and RFC 7914, adds further scalar multiplications checked against `add`, and studies ECDSA and discrete logarithms on the toy curves. Every expected value in it was checked before it was written down: published vectors were parsed from the primary texts and recomputed by an independent implementation, and toy-curve values were derived by hand and by an independent implementation. Do not edit them to match the code.
+
 ### 2026-10-31 - Antigravity - Phase 79
 
 Updated README.md to document toy3, coordinate range in isOnCurve, Sec1 encoding, multiplyUnreduced, validatePublicKey, Jacobian, scalarMultiplyLadder, DiscreteLog, countPoints, Hasse bound, twistCoefficients, SEC 1 messageRepresentative, Rfc6979, Rsa.decryptOaep, and the cited checks from RFC 7914 section 11, RFC 6979 sections A.1.2 and A.2.5, and RFC 5903 section 8.1. Confirmed Docs/agent_channel.md has one entry for each phase from 49 through 79 and that all entries from phases 0 through 48 remain intact. `dotnet test --configuration Release` passed. The long-haul program is complete.
