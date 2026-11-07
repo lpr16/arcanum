@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 98
+
+Added Primes.millerRabinWithBases in Primes.fs and locked Carmichael number 561, strong pseudoprime 3215031751, and 12-base checks in PrimeTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 97
 
 Locked the second PBKDF2-HMAC-SHA256 vector of RFC 7914 section 11 (`"Password"`, `"NaCl"`, `c = 80000`, `dkLen = 64`) in Pbkdf2Tests.fs. `dotnet test --configuration Release` passed.

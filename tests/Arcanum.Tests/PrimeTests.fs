@@ -1,6 +1,7 @@
 namespace Arcanum.Tests
 
 open System
+open System.Numerics
 open Xunit
 open Arcanum.Core
 
@@ -32,3 +33,26 @@ module PrimeTests =
         let draws1to18 = [ for _ in 1 .. 1000 -> Primes.randomBigInteger 1I 18I ]
         Assert.All(draws1to18, fun x -> Assert.True(x >= 1I && x <= 18I))
         Assert.Contains(18I, draws1to18)
+
+    [<Fact>]
+    let ``Phase 98 - Miller-Rabin with fixed bases`` () =
+        // 561 = 3 * 11 * 17 is a Carmichael number: 2^560 = 1 (mod 561),
+        // and 560 = 35 * 2^4 gives 2^35, 2^70, 2^140, 2^280 = 263, 166, 67, 1 (mod 561).
+        Assert.Equal(561I, 3I * 11I * 17I)
+        Assert.Equal(1I, Modular.modPow 2I 560I 561I)
+        Assert.Equal<BigInteger list>(
+            [ 263I; 166I; 67I; 1I ],
+            [ for e in [ 35I; 70I; 140I; 280I ] -> Modular.modPow 2I e 561I ])
+        Assert.False(Primes.millerRabinWithBases 561I [ 2I ])
+
+        // 3215031751 = 151 * 751 * 28351 is a strong pseudoprime to bases 2, 3, 5, 7, but fails base 11.
+        let n = 3215031751I
+        Assert.Equal(n, 151I * 751I * 28351I)
+        Assert.True(Primes.millerRabinWithBases n [ 2I; 3I; 5I; 7I ])
+        Assert.False(Primes.millerRabinWithBases n [ 11I ])
+
+        let firstTwelvePrimes = [ 2I; 3I; 5I; 7I; 11I; 13I; 17I; 19I; 23I; 29I; 31I; 37I ]
+        for p in [ 2I; 3I; 17I; 19I; 97I ] do
+            Assert.True(Primes.millerRabinWithBases p firstTwelvePrimes)
+        for c in [ 1I; 4I; 91I; 561I; 1105I; 3215031751I ] do
+            Assert.False(Primes.millerRabinWithBases c firstTwelvePrimes)

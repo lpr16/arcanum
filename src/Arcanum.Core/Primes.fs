@@ -127,3 +127,37 @@ module Primes =
             else
                 loop ()
         loop ()
+
+    /// Miller-Rabin probable-prime test against a fixed list of bases (no random source).
+    /// A true result means probable prime, not proved prime.
+    /// Uses Modular.modPow, which delegates non-negative exponents to the CLR BigInteger.ModPow call.
+    let millerRabinWithBases (n: BigInteger) (bases: BigInteger list) : bool =
+        if n < 2I then false
+        elif n = 2I then true
+        elif n % 2I = BigInteger.Zero then false
+        else
+            let mutable d = n - BigInteger.One
+            let mutable s = 0
+            while d % 2I = BigInteger.Zero do
+                d <- d / 2I
+                s <- s + 1
+
+            let passesBase (a: BigInteger) : bool =
+                let aMod = Modular.modPos a n
+                if aMod = BigInteger.Zero then
+                    true
+                else
+                    let mutable x = Modular.modPow aMod d n
+                    if x = BigInteger.One || x = n - BigInteger.One then
+                        true
+                    else
+                        let mutable passed = false
+                        let mutable r = 1
+                        while r < s && not passed do
+                            x <- Modular.modPow x 2I n
+                            if x = n - BigInteger.One then
+                                passed <- true
+                            r <- r + 1
+                        passed
+
+            bases |> List.forall passesBase
