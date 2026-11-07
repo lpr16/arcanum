@@ -97,3 +97,14 @@ module JacobianTests =
             Assert.Equal(
                 EllipticCurve.negate curve curve.G,
                 unreducedJacobianDoubleAndAdd curve (curve.N - 1I) curve.G)
+
+    [<Fact>]
+    let ``Phase 113 - addMixed agrees with EllipticCurve.add on toy, toy2, and toy3`` () =
+        for curve in [ EllipticCurve.toy; EllipticCurve.toy2; EllipticCurve.toy3 ] do
+            let pts = allPoints curve
+            for q in pts do
+                let qLifted = liftWithLambda curve 3I q
+                for r in pts do
+                    Assert.Equal(
+                        EllipticCurve.add curve q r,
+                        Jacobian.toAffine curve (Jacobian.addMixed curve qLifted r))

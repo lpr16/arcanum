@@ -95,3 +95,41 @@ module Jacobian =
                 let y3 = Modular.modPos (r * (u1hSq - x3) - s1 * hCube) p
                 let z3 = Modular.modPos (h * z1 * z2) p
                 { X = x3; Y = y3; Z = z3 }
+
+    /// Mixed Jacobian-affine point addition for y^2 = x^3 + a*x + b modulo P, where p2 has Z2 = 1.
+    /// If p2 is Infinity, returns p1. If Z1 = 0, returns ofAffine p2. Otherwise:
+    /// U1 = X1, S1 = Y1, U2 = x2 * Z1^2, S2 = y2 * Z1^3.
+    /// If U1 = U2: when S1 = S2 returns double p1, otherwise returns (1 : 1 : 0).
+    /// Otherwise H = U2 - U1, R = S2 - S1,
+    /// X3 = R^2 - H^3 - 2 * U1 * H^2, Y3 = R * (U1 * H^2 - X3) - S1 * H^3, Z3 = H * Z1 (all modulo P).
+    /// No constant-time claim is made.
+    let addMixed (curve: EllipticCurve.Curve) (p1: JacobianPoint) (p2: EllipticCurve.ECPoint) : JacobianPoint =
+        match p2 with
+        | EllipticCurve.Infinity -> p1
+        | EllipticCurve.Point(x2, y2) ->
+            let p = curve.P
+            let z1 = Modular.modPos p1.Z p
+            if z1 = BigInteger.Zero then
+                ofAffine p2
+            else
+                let z1Sq = Modular.modPos (z1 * z1) p
+                let z1Cube = Modular.modPos (z1Sq * z1) p
+                let u1 = Modular.modPos p1.X p
+                let u2 = Modular.modPos (x2 * z1Sq) p
+                let s1 = Modular.modPos p1.Y p
+                let s2 = Modular.modPos (y2 * z1Cube) p
+                if u1 = u2 then
+                    if s1 = s2 then
+                        double curve p1
+                    else
+                        { X = BigInteger.One; Y = BigInteger.One; Z = BigInteger.Zero }
+                else
+                    let h = Modular.modPos (u2 - u1) p
+                    let r = Modular.modPos (s2 - s1) p
+                    let hSq = Modular.modPos (h * h) p
+                    let hCube = Modular.modPos (hSq * h) p
+                    let u1hSq = Modular.modPos (u1 * hSq) p
+                    let x3 = Modular.modPos (r * r - hCube - 2I * u1hSq) p
+                    let y3 = Modular.modPos (r * (u1hSq - x3) - s1 * hCube) p
+                    let z3 = Modular.modPos (h * z1) p
+                    { X = x3; Y = y3; Z = z3 }

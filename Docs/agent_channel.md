@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 113
+
+Added Jacobian.addMixed in Jacobian.fs and locked mixed Jacobian-affine addition across all point pairs on toy, toy2, and toy3 in JacobianTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 112
 
 Updated Ecdsa.verify to compute u1 * G + u2 * Q with a single EllipticCurve.multiScalarMultiply call, and locked verification on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
