@@ -36,7 +36,9 @@ module Ecdsa =
     /// Signs a message using ECDSA with a specified nonce k (useful for testing or RFC 6979).
     let signWithNonce (keyPair: EcdsaKeyPair) (message: byte[]) (k: BigInteger) : Result<EcdsaSignature, CryptoError> =
         let curve = keyPair.Curve
-        if k <= BigInteger.Zero || k >= curve.N then
+        if keyPair.PrivateKey <= BigInteger.Zero || keyPair.PrivateKey >= curve.N then
+            Error (ParameterOutOfRange "Private key d must be in range [1, n-1]")
+        elif k <= BigInteger.Zero || k >= curve.N then
             Error (ParameterOutOfRange "Nonce k must be in range [1, n-1]")
         else
             match EllipticCurve.scalarMultiply curve k curve.G with

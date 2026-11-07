@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 83
+
+Checked keyPair.PrivateKey in [1, n-1] before any other work in Ecdsa.signWithNonce, and locked out-of-range refusals (d = 0, 19, -1) and valid signatures (d = 1 and d = 5) on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 82
 
 Updated Rsa.generateKeyPair to require an even bit length of at least 16 and redraw primes when bitLength (p * q) differs from the requested length, and locked 512-bit modulus length and odd-bit rejection in RsaTests.fs. `dotnet test --configuration Release` passed.

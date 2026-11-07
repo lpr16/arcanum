@@ -136,3 +136,37 @@ module ToyEcdsaTests =
         // On toy (N = 18), S = 6 is not invertible modulo 18, so verify returns false.
         let toyPub = EllipticCurve.toy.G
         Assert.False(Ecdsa.verify EllipticCurve.toy toyPub msgEc { R = 6I; S = 6I })
+
+    [<Fact>]
+    let ``Phase 83 - ECDSA signWithNonce checks private-key range [1, n-1]`` () =
+        let curve = EllipticCurve.toy3
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let k = 4I
+
+        for badD in [ 0I; 19I; -1I ] do
+            let badKey: Ecdsa.EcdsaKeyPair = {
+                PrivateKey = badD
+                PublicKey = EllipticCurve.Infinity
+                Curve = curve
+            }
+            match Ecdsa.signWithNonce badKey msgEc k with
+            | Error _ -> ()
+            | Ok _ -> Assert.Fail("Expected signWithNonce with out-of-range private key to return Error")
+
+        let key1: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 1I
+            PublicKey = curve.G
+            Curve = curve
+        }
+        match Ecdsa.signWithNonce key1 msgEc k with
+        | Ok sig1 ->
+            Assert.Equal({ R = 3I; S = 11I }, sig1)
+            Assert.True(Ecdsa.verify curve curve.G msgEc sig1)
+        | Error err -> Assert.Fail(sprintf "Unexpected error for d = 1: %A" err)
+
+        let key5: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 5I
+            PublicKey = EllipticCurve.Point(9I, 16I)
+            Curve = curve
+        }
+        Assert.Equal(Ok { R = 3I; S = 14I }, Ecdsa.signWithNonce key5 msgEc k)
