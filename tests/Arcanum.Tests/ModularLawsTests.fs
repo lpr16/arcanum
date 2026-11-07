@@ -54,3 +54,18 @@ module ModularLawsTests =
 
         Assert.Equal(None, Modular.modSqrt 3I 17I)
         Assert.Equal(Some 0I, Modular.modSqrt 0I 17I)
+
+    [<Fact>]
+    let ``Phase 101 - Montgomery batch inversion modulo 17`` () =
+        let inputs = [ 1I .. 16I ]
+        let expected = [ 1I; 9I; 6I; 13I; 7I; 3I; 5I; 15I; 2I; 12I; 14I; 10I; 4I; 11I; 8I; 16I ]
+        match Modular.batchInverse inputs 17I with
+        | Ok actual ->
+            Assert.Equal<BigInteger list>(expected, actual)
+            for (x, inv) in List.zip inputs actual do
+                Assert.Equal(Some inv, Modular.modInverse x 17I)
+        | Error err -> Assert.Fail(sprintf "Unexpected batchInverse error: %A" err)
+
+        Assert.Equal(Ok ([] : BigInteger list), Modular.batchInverse [] 17I)
+        Assert.True(Result.isError (Modular.batchInverse [ 3I; 0I; 5I ] 17I))
+        Assert.True(Result.isError (Modular.batchInverse [ 3I; 17I ] 17I))

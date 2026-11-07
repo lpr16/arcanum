@@ -149,3 +149,30 @@ module Modular =
                         r <- modPos (r * b) p
 
             result
+
+    /// Montgomery's trick batch modular inversion: computes the modular inverse of every value in the list modulo m
+    /// with one call to modInverse on the product of all values instead of one call per value.
+    /// Returns Ok [] for the empty list, or Error NonInvertibleElement if any value is not invertible modulo m.
+    let batchInverse (values: BigInteger list) (m: BigInteger) : Result<BigInteger list, CryptoError> =
+        match values with
+        | [] -> Ok []
+        | _ when m <= BigInteger.One ->
+            Error (NonInvertibleElement "Modulus must be greater than 1")
+        | _ ->
+            let arr = values |> List.map (fun v -> modPos v m) |> List.toArray
+            let n = arr.Length
+            let prefixes: BigInteger[] = Array.zeroCreate n
+            prefixes.[0] <- arr.[0]
+            for i = 1 to n - 1 do
+                prefixes.[i] <- modPos (prefixes.[i - 1] * arr.[i]) m
+
+            match modInverse prefixes.[n - 1] m with
+            | None -> Error (NonInvertibleElement "At least one element is not invertible modulo m")
+            | Some totalInv ->
+                let invs: BigInteger[] = Array.zeroCreate n
+                let mutable accInv = totalInv
+                for i = n - 1 downto 1 do
+                    invs.[i] <- modPos (accInv * prefixes.[i - 1]) m
+                    accInv <- modPos (accInv * arr.[i]) m
+                invs.[0] <- accInv
+                Ok (Array.toList invs)
