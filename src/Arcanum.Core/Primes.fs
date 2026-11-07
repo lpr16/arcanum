@@ -161,3 +161,27 @@ module Primes =
                         passed
 
             bases |> List.forall passesBase
+
+    /// Lucas primality certificate: checks that n > 2, that dividing n - 1 by each listed factor q
+    /// as many times as it goes leaves 1, that a^(n - 1) mod n = 1, and that a^((n - 1) / q) mod n <> 1
+    /// for every listed q. The listed q must themselves be prime; this function does not check that,
+    /// and no factoring routine is included.
+    let lucasCertificate (n: BigInteger) (a: BigInteger) (primeFactorsOfNMinus1: BigInteger list) : bool =
+        if n <= 2I || List.isEmpty primeFactorsOfNMinus1 || primeFactorsOfNMinus1 |> List.exists (fun q -> q < 2I) then
+            false
+        else
+            let nMinus1 = n - BigInteger.One
+            if primeFactorsOfNMinus1 |> List.exists (fun q -> nMinus1 % q <> BigInteger.Zero) then
+                false
+            else
+                let mutable rem = nMinus1
+                for q in primeFactorsOfNMinus1 do
+                    while rem % q = BigInteger.Zero do
+                        rem <- rem / q
+                if rem <> BigInteger.One then
+                    false
+                elif Modular.modPow a nMinus1 n <> BigInteger.One then
+                    false
+                else
+                    primeFactorsOfNMinus1
+                    |> List.forall (fun q -> Modular.modPow a (nMinus1 / q) n <> BigInteger.One)

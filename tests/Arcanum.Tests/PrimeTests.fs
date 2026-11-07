@@ -70,3 +70,24 @@ module PrimeTests =
         // secp256k1.P + 2 = 2^256 - 2^32 - 975 = 0 (mod 3), so millerRabinWithBases returns false.
         Assert.Equal(0I, (EllipticCurve.secp256k1.P + 2I) % 3I)
         Assert.False(Primes.millerRabinWithBases (EllipticCurve.secp256k1.P + 2I) firstTwelvePrimes)
+
+    [<Fact>]
+    let ``Phase 100 - Lucas certificates for 17 and 19`` () =
+        Assert.Equal(16I, Modular.modPow 3I 8I 17I)
+        Assert.Equal(1I, Modular.modPow 3I 16I 17I)
+        Assert.True(Primes.lucasCertificate 17I 3I [ 2I ])
+
+        Assert.Equal(1I, Modular.modPow 2I 8I 17I)
+        Assert.False(Primes.lucasCertificate 17I 2I [ 2I ])
+
+        Assert.Equal(18I, Modular.modPow 2I 9I 19I)
+        Assert.Equal(7I, Modular.modPow 2I 6I 19I)
+        Assert.Equal(1I, Modular.modPow 2I 18I 19I)
+        Assert.True(Primes.lucasCertificate 19I 2I [ 2I; 3I ])
+
+        Assert.False(Primes.lucasCertificate 19I 2I [ 2I ])
+
+        let powersOf3Mod17 = [ for e in 0I .. 15I -> Modular.modPow 3I e 17I ]
+        let expectedPowers = [ 1I; 3I; 9I; 10I; 13I; 5I; 15I; 11I; 16I; 14I; 8I; 7I; 4I; 12I; 2I; 6I ]
+        Assert.Equal<BigInteger list>(expectedPowers, powersOf3Mod17)
+        Assert.Equal<BigInteger list>([ 1I .. 16I ], List.sort powersOf3Mod17)
