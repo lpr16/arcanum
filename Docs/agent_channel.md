@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 87
+
+Locked NIST SP 800-38A section F.1.1 (ECB-AES128) and section F.2.1 (CBC-AES128) 4-block vectors through Modes.encryptEcb/decryptEcb and Modes.encryptCbc/decryptCbc in Sp80038aTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 86
 
 Locked FIPS 197 Appendix A.1 key expansion words (`w0..w3`, `w4`, `w5`, `w8`, `w20`, `w40`, `w43`) and Appendix B single-block encryption and decryption in AesBlockTests.fs. `dotnet test --configuration Release` passed.

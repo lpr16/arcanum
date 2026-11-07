@@ -39,6 +39,7 @@
     <Compile Include="Rfc6979Tests.fs" />
     <Compile Include="Rfc5903Tests.fs" />
     <Compile Include="BytesTests.fs" />
+    <Compile Include="Sp80038aTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
