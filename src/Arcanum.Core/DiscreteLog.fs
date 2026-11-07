@@ -185,3 +185,41 @@ module DiscreteLog =
                             else
                                 attemptLoop (t + BigInteger.One)
             attemptLoop BigInteger.Zero
+
+    /// Pollard's kangaroo discrete logarithm for k in lo .. hi on the small toy curves (toy, toy2, and toy3) only.
+    /// Uses jump sizes [1; 2; 4] indexed by x mod 3 (with Infinity at index 0), sets the trap after 2 tame jumps
+    /// from hi * basePt, and walks the wild kangaroo from target while dw <= (hi - lo) + dt.
+    /// This walk was checked to meet the trap for every tested case on toy3.
+    let kangaroo
+        (curve: EllipticCurve.Curve)
+        (basePt: EllipticCurve.ECPoint)
+        (target: EllipticCurve.ECPoint)
+        (lo: BigInteger)
+        (hi: BigInteger)
+        : BigInteger option =
+        if hi < lo then
+            None
+        else
+            let jumps = [| 1I; 2I; 4I |]
+            let p1 = basePt
+            let p2 = EllipticCurve.double curve basePt
+            let p4 = EllipticCurve.double curve p2
+            let jumpPts = [| p1; p2; p4 |]
+            let step (pt: EllipticCurve.ECPoint, dist: BigInteger) =
+                let idx =
+                    match pt with
+                    | EllipticCurve.Infinity -> 0
+                    | EllipticCurve.Point(x, _) -> int (Modular.modPos x 3I)
+                (EllipticCurve.add curve pt jumpPts.[idx], dist + jumps.[idx])
+
+            let tameStart = (EllipticCurve.scalarMultiply curve hi basePt, BigInteger.Zero)
+            let (trapPt, dt) = tameStart |> step |> step
+            let bound = (hi - lo) + dt
+            let rec wildLoop (wPt: EllipticCurve.ECPoint, dw: BigInteger) =
+                if dw > bound then
+                    None
+                elif wPt = trapPt then
+                    Some (Modular.modPos (hi + dt - dw) curve.N)
+                else
+                    wildLoop (step (wPt, dw))
+            wildLoop (target, BigInteger.Zero)

@@ -76,3 +76,18 @@ module DiscreteLogTests =
         Assert.Equal(
             None,
             DiscreteLog.pollardRho EllipticCurve.toy (EllipticCurve.Point(0I, 1I)) EllipticCurve.toy.G 3I)
+
+    [<Fact>]
+    let ``Phase 124 - DiscreteLog kangaroo on toy3`` () =
+        let curve = EllipticCurve.toy3
+        Assert.Equal(EllipticCurve.Point(5I, 16I), repeatedAdd curve 18 curve.G)
+        Assert.Equal(EllipticCurve.Point(10I, 6I), repeatedAdd curve 3 curve.G)
+        Assert.Equal(EllipticCurve.Point(9I, 16I), repeatedAdd curve 5 curve.G)
+
+        for k in 0 .. 18 do
+            let kG = repeatedAdd curve k curve.G
+            Assert.Equal(Some (BigInteger k), DiscreteLog.kangaroo curve curve.G kG 0I 18I)
+
+        for k in 5 .. 12 do
+            let kG = repeatedAdd curve k curve.G
+            Assert.Equal(Some (BigInteger k), DiscreteLog.kangaroo curve curve.G kG 5I 12I)

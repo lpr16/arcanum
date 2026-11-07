@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 124
+
+Added DiscreteLog.kangaroo in DiscreteLog.fs and locked Pollard's kangaroo on toy3 across 0 .. 18 and 5 .. 12 in DiscreteLogTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 123
 
 Added DiscreteLog.pollardRho in DiscreteLog.fs and locked Pollard's rho across all 19 points of toy3 and subgroup refusal on toy in DiscreteLogTests.fs. `dotnet test --configuration Release` passed.
