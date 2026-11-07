@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 126
+
+Added Hill.encrypt and Hill.decrypt in Hill.fs and locked 2x2 Hill cipher encryption, decryption, non-invertible key refusal, and non-even/non-A-Z text refusal in ClassicalLawsTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 125
 
 Added Shamir.shareWith and Shamir.reconstructMany in Shamir.fs and locked threshold-3 sharing, subset reconstruction, and 2-share information-theoretic Equivocation across all 17 secrets and 289 coefficient pairs in ShamirTests.fs. `dotnet test --configuration Release` passed.

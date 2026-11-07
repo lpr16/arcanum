@@ -53,4 +53,22 @@ module ClassicalLawsTests =
         Assert.Equal(3, shift)
         Assert.Equal(plaintext, recovered)
 
+    [<Fact>]
+    let ``Phase 126 - Hill cipher 2x2 encryption, decryption, and refusals`` () =
+        let key = (3, 3, 2, 5)
+        Assert.Equal(Ok "HIAT", Hill.encrypt key "HELP")
+        Assert.Equal(Ok "HELP", Hill.decrypt key "HIAT")
+        Assert.Equal(Ok "HELP", Hill.encrypt (15, 17, 20, 9) "HIAT")
+
+        Assert.Equal(Ok "XTPJRGRUDVTQ", Hill.encrypt key "SHORTEXAMPLE")
+        Assert.Equal(Ok "SHORTEXAMPLE", Hill.decrypt key "XTPJRGRUDVTQ")
+
+        for badKey in [ (2, 4, 1, 2); (1, 0, 0, 13); (2, 0, 0, 1) ] do
+            Assert.True(Result.isError (Hill.encrypt badKey "HELP"))
+            Assert.True(Result.isError (Hill.decrypt badKey "HELP"))
+
+        for badText in [ "HEL"; "HE1P" ] do
+            Assert.True(Result.isError (Hill.encrypt key badText))
+            Assert.True(Result.isError (Hill.decrypt key badText))
+
 

@@ -15,6 +15,7 @@
     <Compile Include="Playfair.fs" />
     <Compile Include="Enigma.fs" />
     <Compile Include="Cryptanalysis.fs" />
+    <Compile Include="Hill.fs" />
   </ItemGroup>
 
 </Project>
