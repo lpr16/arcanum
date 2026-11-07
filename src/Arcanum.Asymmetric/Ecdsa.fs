@@ -89,3 +89,29 @@ module Ecdsa =
                 | EllipticCurve.Point(x1, _) ->
                     let v = Modular.modPos x1 curve.N
                     v = sigVal.R
+
+    /// Recovers candidate public keys from a message and ECDSA signature per SEC 1 section 4.1.6.
+    let recoverPublicKeys (curve: EllipticCurve.Curve) (message: byte[]) (sigVal: EcdsaSignature) : EllipticCurve.ECPoint list =
+        if sigVal.R <= BigInteger.Zero || sigVal.R >= curve.N || sigVal.S <= BigInteger.Zero || sigVal.S >= curve.N then
+            []
+        else
+            match Modular.modInverse sigVal.R curve.N with
+            | None -> []
+            | Some rInv ->
+                let e = messageRepresentative curve message
+                let negEG = EllipticCurve.negate curve (EllipticCurve.scalarMultiply curve e curve.G)
+                let mutable results = []
+                let mutable j = BigInteger.Zero
+                while sigVal.R + j * curve.N < curve.P do
+                    let x = sigVal.R + j * curve.N
+                    for yBit in [ 0; 1 ] do
+                        match EllipticCurve.decompress curve (EllipticCurve.Compressed(x, yBit)) with
+                        | Some rPt when EllipticCurve.multiplyUnreduced curve curve.N rPt = EllipticCurve.Infinity ->
+                            let sR = EllipticCurve.scalarMultiply curve sigVal.S rPt
+                            let diff = EllipticCurve.add curve sR negEG
+                            let qPt = EllipticCurve.scalarMultiply curve rInv diff
+                            if verify curve qPt message sigVal then
+                                results <- results @ [ qPt ]
+                        | _ -> ()
+                    j <- j + BigInteger.One
+                results

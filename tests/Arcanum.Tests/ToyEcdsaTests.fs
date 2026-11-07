@@ -231,3 +231,51 @@ module ToyEcdsaTests =
                 | Error _ -> yield k
                 | Ok sigVal -> Assert.True(Ecdsa.verify curve pub msgEx sigVal) ]
         Assert.Equal<BigInteger list>([ 7I; 12I ], refusedEx)
+
+    [<Fact>]
+    let ``Phase 119 - SEC 1 public-key recovery on toy3`` () =
+        let curve = EllipticCurve.toy3
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+
+        let recovered3_14 = Ecdsa.recoverPublicKeys curve msgEc { R = 3I; S = 14I }
+        Assert.Equal<EllipticCurve.ECPoint list>(
+            [ EllipticCurve.Point(0I, 11I); EllipticCurve.Point(9I, 16I) ],
+            recovered3_14)
+
+        let mutable totalSucceeded = 0
+        let mutable countTwo = 0
+        let mutable countOne = 0
+        for d in 1I .. 18I do
+            let pub = EllipticCurve.scalarMultiply curve d curve.G
+            let kp: Ecdsa.EcdsaKeyPair = {
+                PrivateKey = d
+                PublicKey = pub
+                Curve = curve
+            }
+            for k in 1I .. 18I do
+                match Ecdsa.signWithNonce kp msgEc k with
+                | Error _ -> ()
+                | Ok sigVal ->
+                    totalSucceeded <- totalSucceeded + 1
+                    let recKeys = Ecdsa.recoverPublicKeys curve msgEc sigVal
+                    Assert.Contains(pub, recKeys)
+                    if recKeys.Length = 2 then countTwo <- countTwo + 1
+                    elif recKeys.Length = 1 then countOne <- countOne + 1
+                    else Assert.Fail(sprintf "Unexpected recovered list length %d" recKeys.Length)
+
+        Assert.Equal(272, totalSucceeded)
+        Assert.Equal(256, countTwo)
+        Assert.Equal(16, countOne)
+
+        let kp1: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 1I
+            PublicKey = curve.G
+            Curve = curve
+        }
+        match Ecdsa.signWithNonce kp1 msgEc 8I with
+        | Ok sig1_8 ->
+            Assert.Equal({ R = 13I; S = 2I }, sig1_8)
+            Assert.Equal<EllipticCurve.ECPoint list>(
+                [ curve.G ],
+                Ecdsa.recoverPublicKeys curve msgEc sig1_8)
+        | Error e -> Assert.Fail(sprintf "Unexpected error: %A" e)
