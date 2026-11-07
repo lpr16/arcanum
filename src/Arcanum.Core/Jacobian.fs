@@ -175,3 +175,34 @@ module Jacobian =
                 let y3 = Modular.modPos (m * (s - x3) - 8I * y1Fourth) p
                 let z3 = Modular.modPos (2I * y1 * z1) p
                 Ok { X = x3; Y = y3; Z = z3 }
+
+    /// Converts a list of Jacobian points to affine coordinates in input order with one field inversion,
+    /// using Modular.batchInverse on the non-zero Z values modulo P and mapping Z = 0 to Infinity.
+    /// No constant-time claim is made.
+    let batchToAffine (curve: EllipticCurve.Curve) (pts: JacobianPoint list) : EllipticCurve.ECPoint list =
+        let p = curve.P
+        let nonZeroZs =
+            pts
+            |> List.choose (fun pt ->
+                let z = Modular.modPos pt.Z p
+                if z = BigInteger.Zero then None else Some z)
+        match Modular.batchInverse nonZeroZs p with
+        | Error _ -> List.map (toAffine curve) pts
+        | Ok zInvs ->
+            let rec build acc remPts remInvs =
+                match remPts, remInvs with
+                | [], _ -> List.rev acc
+                | pt :: restPts, _ ->
+                    let z = Modular.modPos pt.Z p
+                    if z = BigInteger.Zero then
+                        build (EllipticCurve.Infinity :: acc) restPts remInvs
+                    else
+                        match remInvs with
+                        | zInv :: restInvs ->
+                            let zInv2 = Modular.modPos (zInv * zInv) p
+                            let zInv3 = Modular.modPos (zInv2 * zInv) p
+                            let x = Modular.modPos (pt.X * zInv2) p
+                            let y = Modular.modPos (pt.Y * zInv3) p
+                            build (EllipticCurve.Point(x, y) :: acc) restPts restInvs
+                        | [] -> List.rev acc
+            build [] pts zInvs

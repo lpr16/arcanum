@@ -168,3 +168,36 @@ module JacobianTests =
                 | Ok doubled ->
                     Assert.Equal(expected, Jacobian.toAffine EllipticCurve.nistP256 doubled)
                 | Error e -> Assert.Fail(sprintf "Unexpected error: %A" e)
+
+    [<Fact>]
+    let ``Phase 116 - batchToAffine on lifted toy curve points, mixed Infinity lists, and empty list`` () =
+        for curve in [ EllipticCurve.toy; EllipticCurve.toy2; EllipticCurve.toy3 ] do
+            let pts = allPoints curve
+            let mutable finiteIdx = 0
+            let liftedPts =
+                [ for pt in pts do
+                    match pt with
+                    | EllipticCurve.Infinity ->
+                        yield Jacobian.ofAffine EllipticCurve.Infinity
+                    | EllipticCurve.Point _ ->
+                        let lambda = 1I + BigInteger(finiteIdx % 16)
+                        finiteIdx <- finiteIdx + 1
+                        yield liftWithLambda curve lambda pt ]
+            let batch = Jacobian.batchToAffine curve liftedPts
+            Assert.Equal<EllipticCurve.ECPoint list>(List.map (Jacobian.toAffine curve) liftedPts, batch)
+            Assert.Equal<EllipticCurve.ECPoint list>(pts, batch)
+            Assert.Equal<EllipticCurve.ECPoint list>([], Jacobian.batchToAffine curve [])
+
+        let mixed =
+            [ Jacobian.ofAffine EllipticCurve.Infinity
+              liftWithLambda EllipticCurve.toy3 3I EllipticCurve.toy3.G
+              Jacobian.ofAffine EllipticCurve.Infinity
+              liftWithLambda EllipticCurve.toy3 7I (EllipticCurve.double EllipticCurve.toy3 EllipticCurve.toy3.G)
+              Jacobian.ofAffine EllipticCurve.Infinity ]
+        let expectedMixed =
+            [ EllipticCurve.Infinity
+              EllipticCurve.toy3.G
+              EllipticCurve.Infinity
+              EllipticCurve.double EllipticCurve.toy3 EllipticCurve.toy3.G
+              EllipticCurve.Infinity ]
+        Assert.Equal<EllipticCurve.ECPoint list>(expectedMixed, Jacobian.batchToAffine EllipticCurve.toy3 mixed)

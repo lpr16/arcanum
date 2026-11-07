@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 116
+
+Added Jacobian.batchToAffine in Jacobian.fs and locked batch conversion across lifted points of toy, toy2, and toy3, mixed Infinity lists, and the empty list in JacobianTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 115
 
 Added Jacobian.doubleAMinus3 in Jacobian.fs and locked refusal of curves with a <> -3 mod P and agreement with EllipticCurve.double on NIST P-256 points in JacobianTests.fs. `dotnet test --configuration Release` passed.
