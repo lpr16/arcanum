@@ -279,3 +279,19 @@ module ToyEcdsaTests =
                 [ curve.G ],
                 Ecdsa.recoverPublicKeys curve msgEc sig1_8)
         | Error e -> Assert.Fail(sprintf "Unexpected error: %A" e)
+
+    [<Fact>]
+    let ``Phase 121 - ECDSA malleability on toy3`` () =
+        let curve = EllipticCurve.toy3
+        let pub = EllipticCurve.Point(9I, 16I)
+        let msgEc = Encoding.ASCII.GetBytes("ec")
+        let keyPair: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 5I
+            PublicKey = pub
+            Curve = curve
+        }
+
+        let malleableSig = { R = 3I; S = 19I - 14I }
+        Assert.Equal({ R = 3I; S = 5I }, malleableSig)
+        Assert.True(Ecdsa.verify curve pub msgEc malleableSig)
+        Assert.Equal(Ok malleableSig, Ecdsa.signWithNonce keyPair msgEc 15I)

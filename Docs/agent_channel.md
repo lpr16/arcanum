@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 121
+
+Locked ECDSA signature malleability (r, N - s) on the NIST P-256 RFC 6979 vectors in Rfc6979Tests.fs and on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 120
 
 Locked SEC 1 public-key recovery on the published RFC 6979 section A.2.5 NIST P-256 signatures for "sample" and "test" in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.

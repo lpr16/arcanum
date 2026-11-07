@@ -144,3 +144,46 @@ module Rfc6979Tests =
             Assert.True(Ecdsa.verify curve q msgSample sigSample)
         for q in recTest do
             Assert.True(Ecdsa.verify curve q msgTest sigTest)
+
+    [<Fact>]
+    let ``Phase 121 - ECDSA malleability on NIST P-256 RFC 6979 vectors`` () =
+        let curve = EllipticCurve.nistP256
+        let x = hexInt "C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721"
+        let u =
+            EllipticCurve.Point(
+                hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        let keyPair : Ecdsa.EcdsaKeyPair = {
+            PrivateKey = x
+            PublicKey = u
+            Curve = curve
+        }
+        let msgSample = Encoding.ASCII.GetBytes("sample")
+        let msgTest = Encoding.ASCII.GetBytes("test")
+
+        let sigSample : EcdsaSignature = {
+            R = hexInt "EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716"
+            S = hexInt "F7CB1C942D657C41D436C7A1B6E29F65F3E900DBB9AFF4064DC4AB2F843ACDA8"
+        }
+        let sigTest : EcdsaSignature = {
+            R = hexInt "F1ABB023518351CD71D881567B1EA663ED3EFCF6C5132B354F28D3B0B7D38367"
+            S = hexInt "019F4113742A2B14BD25926B49C649155F267E60D3814B4C0CC84250E46F0083"
+        }
+
+        let expectedSampleNegS = hexInt "0834E36AD29A83BF2BC9385E491D6099C8FDF9D1ED67AA7EA5F51F93782857A9"
+        let expectedTestNegS = hexInt "FE60BEEB8BD5D4EC42DA6D94B639B6EA5DC07C4CD3965338E6F1887217F424CE"
+
+        Assert.Equal(expectedSampleNegS, curve.N - sigSample.S)
+        Assert.Equal(expectedTestNegS, curve.N - sigTest.S)
+
+        Assert.True(Ecdsa.verify curve u msgSample { sigSample with S = expectedSampleNegS })
+        Assert.True(Ecdsa.verify curve u msgTest { sigTest with S = expectedTestNegS })
+
+        Assert.False(Ecdsa.verify curve u msgSample { sigSample with S = sigSample.S + 1I })
+        Assert.False(Ecdsa.verify curve u msgTest { sigTest with S = sigTest.S + 1I })
+
+        Assert.True(sigSample.S > curve.N / 2I)
+        Assert.True(sigTest.S < curve.N / 2I)
+
+        Assert.Equal(Ok sigSample, Rfc6979.sign keyPair msgSample)
+        Assert.Equal(Ok sigTest, Rfc6979.sign keyPair msgTest)
