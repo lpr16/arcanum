@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 94
+
+Locked RFC 8439 Appendix A.5 265-byte ChaCha20-Poly1305 AEAD decryption and encryption in AeadTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 93
 
 Locked RFC 8439 section 2.8.2 ChaCha20-Poly1305 AEAD encryption, decryption, tag bit-flip rejection, and AAD byte-modification rejection in AeadTests.fs. `dotnet test --configuration Release` passed.
