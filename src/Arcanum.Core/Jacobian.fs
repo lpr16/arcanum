@@ -151,3 +151,27 @@ module Jacobian =
                 if b = 1 then
                     acc <- addMixed curve acc pt
             toAffine curve acc
+
+    /// Point doubling in Jacobian coordinates when a = -3 modulo P, using
+    /// M = 3 * (X1 - Z1^2) * (X1 + Z1^2) modulo P. Refuses any curve with modPos (A + 3) P <> 0.
+    /// No constant-time claim is made.
+    let doubleAMinus3 (curve: EllipticCurve.Curve) (pt: JacobianPoint) : Result<JacobianPoint, CryptoError> =
+        let p = curve.P
+        if Modular.modPos (curve.A + 3I) p <> BigInteger.Zero then
+            Error (ParameterOutOfRange "doubleAMinus3 requires a = -3 modulo P.")
+        else
+            let x1 = Modular.modPos pt.X p
+            let y1 = Modular.modPos pt.Y p
+            let z1 = Modular.modPos pt.Z p
+            if z1 = BigInteger.Zero || y1 = BigInteger.Zero then
+                Ok { X = BigInteger.One; Y = BigInteger.One; Z = BigInteger.Zero }
+            else
+                let y1Sq = Modular.modPos (y1 * y1) p
+                let y1Fourth = Modular.modPos (y1Sq * y1Sq) p
+                let z1Sq = Modular.modPos (z1 * z1) p
+                let s = Modular.modPos (4I * x1 * y1Sq) p
+                let m = Modular.modPos (3I * (x1 - z1Sq) * (x1 + z1Sq)) p
+                let x3 = Modular.modPos (m * m - 2I * s) p
+                let y3 = Modular.modPos (m * (s - x3) - 8I * y1Fourth) p
+                let z3 = Modular.modPos (2I * y1 * z1) p
+                Ok { X = x3; Y = y3; Z = z3 }

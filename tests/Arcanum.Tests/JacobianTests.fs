@@ -138,3 +138,33 @@ module JacobianTests =
                 hex "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
                 hex "1ae168fea63dc339a3c58419466ceaeef7f632653266d0e1236431a950cfe52a")
         Assert.Equal(expectedDoubleG, Jacobian.scalarMultiply EllipticCurve.secp256k1 2I EllipticCurve.secp256k1.G)
+
+    [<Fact>]
+    let ``Phase 115 - doubleAMinus3 refuses non-a=-3 curves and agrees with EllipticCurve.double on NIST P-256`` () =
+        for curve in [ EllipticCurve.toy; EllipticCurve.toy2; EllipticCurve.toy3; EllipticCurve.secp256k1 ] do
+            match Jacobian.doubleAMinus3 curve (Jacobian.ofAffine curve.G) with
+            | Error (ParameterOutOfRange _) -> ()
+            | other -> Assert.Fail(sprintf "Expected ParameterOutOfRange, got %A" other)
+
+        let hex (s: string) = BigInteger.Parse("0" + s, NumberStyles.HexNumber)
+        let uPt =
+            EllipticCurve.Point(
+                hex "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hex "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        let iPt =
+            EllipticCurve.Point(
+                hex "DAD0B65394221CF9B051E1FECA5787D098DFE637FC90B9EF945D0C3772581180",
+                hex "5271A0461CDB8252D61F1C456FA3E59AB1F45B33ACCF5F58389E0577B8990BB3")
+        let rPt =
+            EllipticCurve.Point(
+                hex "D12DFB5289C8D4F81208B70270398C342296970A0BCCB74C736FC7554494BF63",
+                hex "56FBF3CA366CC23E8157854C13C58D6AAC23F046ADA30F8353E74F33039872AB")
+
+        for pt in [ EllipticCurve.nistP256.G; uPt; iPt; rPt ] do
+            let expected = EllipticCurve.double EllipticCurve.nistP256 pt
+            for lambda in [ 1I; 2I ] do
+                let lifted = liftWithLambda EllipticCurve.nistP256 lambda pt
+                match Jacobian.doubleAMinus3 EllipticCurve.nistP256 lifted with
+                | Ok doubled ->
+                    Assert.Equal(expected, Jacobian.toAffine EllipticCurve.nistP256 doubled)
+                | Error e -> Assert.Fail(sprintf "Unexpected error: %A" e)
