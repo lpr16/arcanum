@@ -204,6 +204,55 @@ module EllipticCurve =
                     acc <- add curve acc negPt
             acc
 
+    /// Width-w non-adjacent form (wNAF) of a non-negative integer for w >= 2, least significant digit first.
+    let wnaf (w: int) (kInit: BigInteger) : int list =
+        if w < 2 then
+            raise (ArgumentOutOfRangeException(nameof w, "Window width w must be at least 2"))
+        if kInit < BigInteger.Zero then
+            raise (ArgumentOutOfRangeException(nameof kInit, "Scalar must be non-negative"))
+        let twoW = BigInteger.One <<< w
+        let halfTwoW = BigInteger.One <<< (w - 1)
+        let mutable k = kInit
+        let mutable digits = []
+        while k > BigInteger.Zero do
+            let d =
+                if (k &&& BigInteger.One) = BigInteger.One then
+                    let rem = k % twoW
+                    let signedRem = if rem >= halfTwoW then rem - twoW else rem
+                    int signedRem
+                else
+                    0
+            digits <- d :: digits
+            k <- (k - BigInteger d) / 2I
+        List.rev digits
+
+    /// Scalar multiplication using width-w NAF: reduces the scalar modulo N, precomputes odd multiples
+    /// P, 3P, 5P, ..., (2^(w-1) - 1) P by repeated addition of 2P, and walks the wNAF digits from the top.
+    /// Checked against EllipticCurve.add; no constant-time claim is made.
+    let scalarMultiplyWnaf (curve: Curve) (w: int) (kVal: BigInteger) (pt: ECPoint) : ECPoint =
+        if w < 2 then
+            raise (ArgumentOutOfRangeException(nameof w, "Window width w must be at least 2"))
+        let k = Modular.modPos kVal curve.N
+        if k = BigInteger.Zero || pt = Infinity then
+            Infinity
+        else
+            let tableLen = 1 <<< (w - 2)
+            let table: ECPoint[] = Array.zeroCreate tableLen
+            table.[0] <- pt
+            let twoP = double curve pt
+            for i = 1 to tableLen - 1 do
+                table.[i] <- add curve table.[i - 1] twoP
+
+            let digitsMostFirst = List.rev (wnaf w k)
+            let mutable acc = Infinity
+            for d in digitsMostFirst do
+                acc <- double curve acc
+                if d > 0 then
+                    acc <- add curve acc table.[(d - 1) / 2]
+                elif d < 0 then
+                    acc <- add curve acc (negate curve table.[(-d - 1) / 2])
+            acc
+
     /// Public-key validation per SEC 1 section 3.2.2.1.
     /// Refuses Infinity, refuses a point that fails isOnCurve (including the 0 .. P - 1 coordinate range),
     /// and refuses a point with multiplyUnreduced curve curve.N Q <> Infinity.

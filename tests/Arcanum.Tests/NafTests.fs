@@ -71,3 +71,50 @@ module NafTests =
                 hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
                 hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
         Assert.Equal(expectedU, EllipticCurve.scalarMultiplyNaf EllipticCurve.nistP256 x EllipticCurve.nistP256.G)
+
+    [<Fact>]
+    let ``Phase 110 - Width-w NAF representation and scalarMultiplyWnaf`` () =
+        Assert.Equal<int list>([ 7 ], EllipticCurve.wnaf 4 7I)
+        Assert.Equal<int list>([ -3; 0; 0; 0; 0; 1 ], EllipticCurve.wnaf 4 29I)
+        Assert.Equal<int list>([ -1; 0; 0; 0; 0; 0; 0; 0; 1 ], EllipticCurve.wnaf 4 255I)
+        Assert.Equal<int list>([ 0; 0; 0; -3; 0; 0; 0; 0; 0; 0; 1 ], EllipticCurve.wnaf 4 1000I)
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> EllipticCurve.wnaf 1 5I |> ignore) |> ignore
+        Assert.Throws<ArgumentOutOfRangeException>(fun () -> EllipticCurve.wnaf 4 -1I |> ignore) |> ignore
+
+        for k in 0I .. 2000I do
+            Assert.Equal<int list>(EllipticCurve.naf k, EllipticCurve.wnaf 2 k)
+
+            let digits4 = EllipticCurve.wnaf 4 k
+            let rebuilt =
+                digits4
+                |> List.mapi (fun i d -> BigInteger d * (BigInteger.One <<< i))
+                |> List.fold (+) BigInteger.Zero
+            Assert.Equal(k, rebuilt)
+
+            for d in digits4 do
+                if d <> 0 then
+                    Assert.Equal(1, abs d % 2)
+                    Assert.True(abs d < 8)
+
+            let arr = List.toArray digits4
+            for i in 0 .. arr.Length - 1 do
+                let windowEnd = min (arr.Length - 1) (i + 3)
+                let nonZeroCount =
+                    [ i .. windowEnd ]
+                    |> List.filter (fun idx -> arr.[idx] <> 0)
+                    |> List.length
+                Assert.True(nonZeroCount <= 1)
+
+        for curve in [ EllipticCurve.toy; EllipticCurve.toy2; EllipticCurve.toy3 ] do
+            for q in allPoints curve do
+                for k in 0I .. curve.N - 1I do
+                    Assert.Equal(
+                        EllipticCurve.scalarMultiply curve k q,
+                        EllipticCurve.scalarMultiplyWnaf curve 4 k q)
+
+        let x = hexInt "C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721"
+        let expectedU =
+            EllipticCurve.Point(
+                hexInt "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6",
+                hexInt "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        Assert.Equal(expectedU, EllipticCurve.scalarMultiplyWnaf EllipticCurve.nistP256 4 x EllipticCurve.nistP256.G)
