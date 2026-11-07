@@ -27,21 +27,24 @@ module Rsa =
         PrivateKey: RsaPrivateKey
     }
 
-    /// Generates an RSA key pair with the specified bit length (e.g., 1024 or 2048 bits).
+    /// Generates an RSA key pair with the exact specified bit length (even, >= 16).
     let generateKeyPair (bitLength: int) : RsaKeyPair =
+        if bitLength < 16 || bitLength % 2 <> 0 then
+            raise (ArgumentOutOfRangeException(nameof bitLength, "Bit length must be even and at least 16"))
+
         let primeBits = bitLength / 2
         let e = 65537I
 
         let rec findPrimes () =
             let p = Primes.generatePrime primeBits 40
             let q = Primes.generatePrime primeBits 40
-            if p = q then findPrimes ()
+            let n = p * q
+            if p = q || int (n.GetBitLength()) <> bitLength then findPrimes ()
             else
                 let phi = (p - BigInteger.One) * (q - BigInteger.One)
                 match Modular.modInverse e phi with
                 | None -> findPrimes () // e and phi not coprime
                 | Some d ->
-                    let n = p * q
                     let dp = d % (p - BigInteger.One)
                     let dq = d % (q - BigInteger.One)
                     let qInv =

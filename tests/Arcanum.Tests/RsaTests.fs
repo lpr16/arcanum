@@ -90,4 +90,15 @@ module RsaTests =
             Assert.True(Result.isError (Rsa.decryptOaep keyPair.PrivateKey emptyLabel flipped))
             Assert.True(Result.isError (Rsa.decryptOaep keyPair.PrivateKey [| 0x01uy |] validCt))
 
+    [<Fact>]
+    let ``Phase 82 - RSA generateKeyPair produces moduli of the exact requested bit length`` () =
+        for _ in 1 .. 4 do
+            let kp = Rsa.generateKeyPair 512
+            Assert.Equal(512L, kp.PublicKey.N.GetBitLength())
+            Assert.Equal(64, Rsa.modulusLength kp.PublicKey.N)
+
+        Assert.Throws<ArgumentOutOfRangeException>(fun () ->
+            Rsa.generateKeyPair 513 |> ignore
+        ) |> ignore
+
 

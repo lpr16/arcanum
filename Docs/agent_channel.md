@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 82
+
+Updated Rsa.generateKeyPair to require an even bit length of at least 16 and redraw primes when bitLength (p * q) differs from the requested length, and locked 512-bit modulus length and odd-bit rejection in RsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 81
 
 Rewrote Primes.randomBigInteger to cover the inclusive range [minVal, maxVal] by bit-masking RandomNumberGenerator.Fill draws and rejecting candidates above maxVal - minVal, and locked bounds and endpoint reachability in PrimeTests.fs. `dotnet test --configuration Release` passed.
