@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 105
+
+Locked 2-torsion points on toy, toy2, and toy3 and the Z/4 x Z/4 decomposition aG + bQ on toy2 with G = (1, 6) and Q = (3, 8) in StructureTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 104
 
 Renamed pointOrderByRepeatedAdd to public DiscreteLog.order in DiscreteLog.fs and locked full point-order histograms on toy, toy2, and toy3 in StructureTests.fs. `dotnet test --configuration Release` passed.
