@@ -71,3 +71,31 @@ module Sec1Tests =
         Assert.Equal(65, k1Uncompressed.Length)
         Assert.Equal(Ok p256.G, Sec1.decodePoint p256 p256Uncompressed)
         Assert.Equal(Ok k1.G, Sec1.decodePoint k1 k1Uncompressed)
+
+    [<Fact>]
+    let ``Phase 106 - SEC 1 round-trip on every point of toy, toy2, and toy3`` () =
+        let allPoints (curve: EllipticCurve.Curve) =
+            EllipticCurve.Infinity
+            :: [ for x in 0I .. curve.P - 1I do
+                   for y in 0I .. curve.P - 1I do
+                       let pt = EllipticCurve.Point(x, y)
+                       if EllipticCurve.isOnCurve curve pt then
+                           yield pt ]
+
+        for (curve, expectedCount) in [ (EllipticCurve.toy, 18); (EllipticCurve.toy2, 16); (EllipticCurve.toy3, 19) ] do
+            let pts = allPoints curve
+            Assert.Equal(expectedCount, pts.Length)
+
+            for compressed in [ true; false ] do
+                let encodings =
+                    [ for q in pts ->
+                        let enc = Sec1.encodePoint curve compressed q
+                        let expectedLen =
+                            match q, compressed with
+                            | EllipticCurve.Infinity, _ -> 1
+                            | _, true -> 2
+                            | _, false -> 3
+                        Assert.Equal(expectedLen, enc.Length)
+                        Assert.Equal(Ok q, Sec1.decodePoint curve enc)
+                        Bytes.toHex enc ]
+                Assert.Equal(expectedCount, (List.distinct encodings).Length)

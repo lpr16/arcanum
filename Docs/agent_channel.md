@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 106
+
+Locked SEC 1 compressed and uncompressed encodePoint/decodePoint round-trip, length, and injectivity across all points of toy (18), toy2 (16), and toy3 (19) in Sec1Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 105
 
 Locked 2-torsion points on toy, toy2, and toy3 and the Z/4 x Z/4 decomposition aG + bQ on toy2 with G = (1, 6) and Q = (3, 8) in StructureTests.fs. `dotnet test --configuration Release` passed.
