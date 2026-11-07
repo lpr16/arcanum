@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 95
+
+Locked RFC 4231 sections 4.4, 4.5, and 4.6 (test cases 3, 4, and 5) through HMAC.hmacSha256 in HmacTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 94
 
 Locked RFC 8439 Appendix A.5 265-byte ChaCha20-Poly1305 AEAD decryption and encryption in AeadTests.fs. `dotnet test --configuration Release` passed.

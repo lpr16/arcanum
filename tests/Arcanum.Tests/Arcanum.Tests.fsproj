@@ -41,6 +41,7 @@
     <Compile Include="BytesTests.fs" />
     <Compile Include="Sp80038aTests.fs" />
     <Compile Include="AeadTests.fs" />
+    <Compile Include="HmacTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
