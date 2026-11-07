@@ -130,3 +130,58 @@ module DiscreteLog =
                         | Error err -> Error err
 
                 collectCongruences factors []
+
+    /// Deterministic Pollard's rho discrete logarithm on the small toy curves (toy, toy2, and toy3) only.
+    /// Requires prime order n of basePt for modular division. Rho needs on the order of sqrt n steps,
+    /// which is why N near 2^256 is out of reach; no such run is made here.
+    let pollardRho
+        (curve: EllipticCurve.Curve)
+        (basePt: EllipticCurve.ECPoint)
+        (target: EllipticCurve.ECPoint)
+        (n: BigInteger)
+        : BigInteger option =
+        if target = EllipticCurve.Infinity then
+            Some BigInteger.Zero
+        elif n <= BigInteger.One || basePt = EllipticCurve.Infinity then
+            None
+        else
+            let step (xPt: EllipticCurve.ECPoint, a: BigInteger, b: BigInteger) =
+                let cls =
+                    match xPt with
+                    | EllipticCurve.Infinity -> 0
+                    | EllipticCurve.Point(x, _) -> int (Modular.modPos x 3I)
+                match cls with
+                | 0 ->
+                    (EllipticCurve.add curve xPt basePt, Modular.modPos (a + BigInteger.One) n, b)
+                | 1 ->
+                    (EllipticCurve.double curve xPt, Modular.modPos (2I * a) n, Modular.modPos (2I * b) n)
+                | _ ->
+                    (EllipticCurve.add curve xPt target, a, Modular.modPos (b + BigInteger.One) n)
+
+            let rec attemptLoop (t: BigInteger) =
+                if t >= n then
+                    None
+                else
+                    let startPt = EllipticCurve.add curve (EllipticCurve.multiplyUnreduced curve t basePt) target
+                    let startState = (startPt, Modular.modPos t n, BigInteger.One)
+                    let rec floyd tortoise hare =
+                        let (xt, at, bt) = step tortoise
+                        let (xh, ah, bh) = step (step hare)
+                        if xt = xh then
+                            (at, bt, ah, bh)
+                        else
+                            floyd (xt, at, bt) (xh, ah, bh)
+                    let (at, bt, ah, bh) = floyd startState startState
+                    let bDiff = Modular.modPos (bh - bt) n
+                    if bDiff = BigInteger.Zero then
+                        attemptLoop (t + BigInteger.One)
+                    else
+                        match Modular.modInverse bDiff n with
+                        | None -> attemptLoop (t + BigInteger.One)
+                        | Some bDiffInv ->
+                            let k = Modular.modPos ((at - ah) * bDiffInv) n
+                            if EllipticCurve.multiplyUnreduced curve k basePt = target then
+                                Some k
+                            else
+                                attemptLoop (t + BigInteger.One)
+            attemptLoop BigInteger.Zero

@@ -64,3 +64,15 @@ module DiscreteLogTests =
         match DiscreteLog.pohligHellman EllipticCurve.toy EllipticCurve.toy.G EllipticCurve.toy.G [ (2I, 1); (3I, 1) ] with
         | Error _ -> ()
         | Ok _ -> Assert.Fail("Expected pohligHellman to refuse factors whose product is not the order of G")
+
+    [<Fact>]
+    let ``Phase 123 - DiscreteLog pollardRho on toy3 and subgroup refusal on toy`` () =
+        for k in 0 .. 18 do
+            let kG = repeatedAdd EllipticCurve.toy3 k EllipticCurve.toy3.G
+            let rho = DiscreteLog.pollardRho EllipticCurve.toy3 EllipticCurve.toy3.G kG 19I
+            Assert.Equal(Some (BigInteger k), rho)
+            Assert.Equal(DiscreteLog.bruteForce EllipticCurve.toy3 EllipticCurve.toy3.G kG, rho)
+
+        Assert.Equal(
+            None,
+            DiscreteLog.pollardRho EllipticCurve.toy (EllipticCurve.Point(0I, 1I)) EllipticCurve.toy.G 3I)
