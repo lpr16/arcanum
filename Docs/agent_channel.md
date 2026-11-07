@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-07 - Antigravity - Phase 117
+
+Locked the secp256k1 endomorphism cube roots beta mod p and lambda mod N and verified lambda * Q = (beta * x, y) on G and 2G and lambda^2 * G = (beta^2 * Gx, Gy) in Secp256k1Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-07 - Antigravity - Phase 116
 
 Added Jacobian.batchToAffine in Jacobian.fs and locked batch conversion across lifted points of toy, toy2, and toy3, mixed Infinity lists, and the empty list in JacobianTests.fs. `dotnet test --configuration Release` passed.

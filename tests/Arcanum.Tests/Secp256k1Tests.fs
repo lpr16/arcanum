@@ -64,3 +64,45 @@ module Secp256k1Tests =
         let nMinusOneG = unreducedDoubleAndAdd nistP256 (nistP256.N - BigInteger.One) nistP256.G
         let negG = negate nistP256 nistP256.G
         Assert.Equal(negG, nMinusOneG)
+
+    [<Fact>]
+    let ``Phase 117 - The secp256k1 GLV endomorphism beta and lambda`` () =
+        // The pairing matters: 2^((N - 1) / 3) mod N is the other cube root, and it pairs with beta^2,
+        // not with beta. P-256 has a = -3, so it has no such map.
+        let p = secp256k1.P
+        let n = secp256k1.N
+        let beta = Modular.modPow 2I ((p - 1I) / 3I) p
+        let lambda = Modular.modPow 2I (2I * (n - 1I) / 3I) n
+
+        Assert.NotEqual(1I, beta)
+        Assert.Equal(1I, Modular.modPow beta 3I p)
+        Assert.Equal(0I, Modular.modPos (beta * beta + beta + 1I) p)
+
+        Assert.NotEqual(1I, lambda)
+        Assert.Equal(1I, Modular.modPow lambda 3I n)
+        Assert.Equal(0I, Modular.modPos (lambda * lambda + lambda + 1I) n)
+
+        let hex (s: string) = BigInteger.Parse("0" + s, NumberStyles.HexNumber)
+        let expectedBeta = hex "7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee"
+        let expectedLambda = hex "5363ad4cc05c30e0a5261c028812645a122e22ea20816678df02967c1b23bd72"
+        Assert.Equal(expectedBeta, beta)
+        Assert.Equal(expectedLambda, lambda)
+
+        match secp256k1.G with
+        | Point(gx, gy) ->
+            Assert.Equal(
+                Point(Modular.modPos (beta * gx) p, gy),
+                scalarMultiply secp256k1 lambda secp256k1.G)
+            let betaSq = Modular.modPos (beta * beta) p
+            let lambdaSq = Modular.modPos (lambda * lambda) n
+            Assert.Equal(
+                Point(Modular.modPos (betaSq * gx) p, gy),
+                scalarMultiply secp256k1 lambdaSq secp256k1.G)
+        | Infinity -> Assert.Fail("secp256k1.G is not Infinity")
+
+        let g2x = hex "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5"
+        let g2y = hex "1ae168fea63dc339a3c58419466ceaeef7f632653266d0e1236431a950cfe52a"
+        let g2 = Point(g2x, g2y)
+        Assert.Equal(
+            Point(Modular.modPos (beta * g2x) p, g2y),
+            scalarMultiply secp256k1 lambda g2)
