@@ -1,6 +1,7 @@
 namespace Arcanum.Tests
 
 open System
+open System.Numerics
 open Xunit
 open Arcanum.Core
 
@@ -99,3 +100,67 @@ module Sec1Tests =
                         Assert.Equal(Ok q, Sec1.decodePoint curve enc)
                         Bytes.toHex enc ]
                 Assert.Equal(expectedCount, (List.distinct encodings).Length)
+
+    [<Fact>]
+    let ``Phase 138 - SEC 1 on NIST P-192 and P-224 generators and leading zero byte round-trip`` () =
+        let p192 = EllipticCurve.nistP192
+        let p224 = EllipticCurve.nistP224
+
+        // P-192 Gy ends in hex digit 1, so it is odd.
+        let p192Gx, p192Gy =
+            match p192.G with
+            | EllipticCurve.Point(x, y) -> x, y
+            | _ -> failwith "unreachable"
+        Assert.Equal(BigInteger.One, p192Gy &&& BigInteger.One)
+
+        // Compressed P-192 G is 03 || 24-byte Gx (length 25)
+        let p192Compressed = Sec1.encodePoint p192 true p192.G
+        Assert.Equal(25, p192Compressed.Length)
+        Assert.Equal(0x03uy, p192Compressed.[0])
+        Assert.Equal(Ok p192.G, Sec1.decodePoint p192 p192Compressed)
+
+        // Uncompressed P-192 G is 04 || Gx || Gy (length 49)
+        let p192Uncompressed = Sec1.encodePoint p192 false p192.G
+        Assert.Equal(49, p192Uncompressed.Length)
+        Assert.Equal(0x04uy, p192Uncompressed.[0])
+        Assert.Equal(Ok p192.G, Sec1.decodePoint p192 p192Uncompressed)
+
+        // P-224 Gy ends in hex digit 4, so it is even.
+        let p224Gx, p224Gy =
+            match p224.G with
+            | EllipticCurve.Point(x, y) -> x, y
+            | _ -> failwith "unreachable"
+        Assert.Equal(BigInteger.Zero, p224Gy &&& BigInteger.One)
+
+        // Compressed P-224 G is 02 || 28-byte Gx (length 29)
+        let p224Compressed = Sec1.encodePoint p224 true p224.G
+        Assert.Equal(29, p224Compressed.Length)
+        Assert.Equal(0x02uy, p224Compressed.[0])
+        Assert.Equal(Ok p224.G, Sec1.decodePoint p224 p224Compressed)
+
+        // Uncompressed P-224 G is 04 || Gx || Gy (length 57)
+        let p224Uncompressed = Sec1.encodePoint p224 false p224.G
+        Assert.Equal(57, p224Uncompressed.Length)
+        Assert.Equal(0x04uy, p224Uncompressed.[0])
+        Assert.Equal(Ok p224.G, Sec1.decodePoint p224 p224Uncompressed)
+
+        // Modular.modSqrt of Gx^3 + A Gx + B modulo P-224 prime is Gy or p - Gy (exercises Tonelli-Shanks with S = 96)
+        let rhs = Modular.modPos (Modular.modPow p224Gx 3I p224.P + p224.A * p224Gx + p224.B) p224.P
+        let sqrtRhs = Modular.modSqrt rhs p224.P
+        Assert.True(sqrtRhs = Some p224Gy || sqrtRhs = Some (p224.P - p224Gy))
+
+        // P-224 public key U from Phase 137 whose Ux begins with a zero byte
+        let ux = BigInteger.Parse("000CF08DA5AD719E42707FA431292DEA11244D64FC51610D94B130D6C", Globalization.NumberStyles.HexNumber)
+        let uy = BigInteger.Parse("0EEAB6F3DEBE455E3DBF85416F7030CBD94F34F2D6F232C69F3C1385A", Globalization.NumberStyles.HexNumber)
+        let u = EllipticCurve.Point(ux, uy)
+
+        let compressedU = Sec1.encodePoint p224 true u
+        Assert.Equal(29, compressedU.Length)
+        Assert.Equal(0x00uy, compressedU.[1]) // leading zero byte is kept
+        Assert.Equal(Ok u, Sec1.decodePoint p224 compressedU)
+
+        let uncompressedU = Sec1.encodePoint p224 false u
+        Assert.Equal(57, uncompressedU.Length)
+        Assert.Equal(0x00uy, uncompressedU.[1]) // leading zero byte is kept
+        Assert.Equal(Ok u, Sec1.decodePoint p224 uncompressedU)
+

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 138
+
+Locked SEC 1 point encoding and decoding on NIST P-192 and P-224 generators: compressed (03 for odd Gy on P-192, 02 for even Gy on P-224) and uncompressed (49 bytes and 57 bytes), general Tonelli-Shanks path (S = 96) in Modular.modSqrt during compressed decoding on P-224, and full round-trip preservation of leading zero bytes on the P-224 public key U in Sec1Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 137
 
 Locked RFC 6979 section A.2.4 deterministic signatures on NIST P-224 with SHA-256 (exercising 32-bit digest truncation where the 256-bit hash loses its last 32 bits to form the 224-bit representative), checking representative below N, public key derivation with leading zero byte in Ux, nonces k, deterministic signatures (r, s), and verification on "sample" and "test" in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
