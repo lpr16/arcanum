@@ -15,6 +15,7 @@
     <Compile Include="Rsa.fs" />
     <Compile Include="Ecdsa.fs" />
     <Compile Include="Rfc6979.fs" />
+    <Compile Include="EcdsaDer.fs" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 141
+
+Added EcdsaDer module in EcdsaDer.fs implementing DER encoding of ECDSA signatures (Ecdsa-Sig-Value SEQUENCE of two minimal non-negative INTEGERs r and s with 00 prefix when MSB is set per RFC 3279 / SEC 1 C.8). Locked exact DER byte encodings for RFC 6979 section A.2.5 NIST P-256 "sample" (72 bytes) and "test" (71 bytes) signatures in EcdsaDerTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 140
 
 Locked RFC 5869 Appendix A.2 (longer IKM, salt, info; L = 82) and Appendix A.3 (empty salt, empty info; L = 42) test vectors with SHA-256 in HkdfTests.fs. Locked HKDF.expand zero length returning empty array, maximum length 255 * 32 = 8160 octets accepted, and length 8161 refused with ParameterOutOfRange per RFC 5869 section 2.3. `dotnet test --configuration Release` passed.
