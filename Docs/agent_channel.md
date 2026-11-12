@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 136
+
+Locked RFC 6979 section A.2.3 deterministic signatures on NIST P-192 with SHA-256 (exercising 64-bit digest truncation where the 256-bit hash loses its last 64 bits to form the 192-bit representative), checking representative below N, public key derivation, nonces k, deterministic signatures (r, s), and verification on "sample" and "test" in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 135
 
 Locked RFC 5114 section A.4 (NIST P-192) and section A.5 (NIST P-224) published key agreement vectors (one vector per section, not a CAVP file) for public key derivation via scalarMultiply and shared secret computation both ways via DiffieHellman.computeEcdhSharedSecretChecked in NistCurveTests.fs. `dotnet test --configuration Release` passed.
