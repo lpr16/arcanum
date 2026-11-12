@@ -47,6 +47,7 @@
     <Compile Include="NistCurveTests.fs" />
     <Compile Include="HkdfTests.fs" />
     <Compile Include="EcdsaDerTests.fs" />
+    <Compile Include="HashToCurveTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

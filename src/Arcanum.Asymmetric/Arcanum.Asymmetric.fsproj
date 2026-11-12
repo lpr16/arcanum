@@ -16,6 +16,7 @@
     <Compile Include="Ecdsa.fs" />
     <Compile Include="Rfc6979.fs" />
     <Compile Include="EcdsaDer.fs" />
+    <Compile Include="HashToCurve.fs" />
   </ItemGroup>
 
 </Project>

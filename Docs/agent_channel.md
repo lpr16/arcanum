@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 143
+
+Added HashToCurve module in HashToCurve.fs with expandMessageXmd using SHA-256 (CLR SHA256.HashData) per RFC 9380 section 5.3.1. Enforced DST length <= 255, len_in_bytes in 1 .. 65535, and ell <= 255 limits. Locked RFC 9380 Appendix K.1 32-byte test vectors across 5 messages and refusal of len_in_bytes = 8161 in HashToCurveTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 142
 
 Added EcdsaDer.decode in EcdsaDer.fs implementing strict DER decoding of ECDSA signatures. Validated exact round-trip decoding of RFC 6979 section A.2.5 "sample" and "test" signatures, and locked strict refusal of non-minimal integers (extra 00), negative integers (missing 00 when MSB set), mismatched sequence length, trailing bytes, non-0x30 tags, and r = 0 in EcdsaDerTests.fs. `dotnet test --configuration Release` passed.
