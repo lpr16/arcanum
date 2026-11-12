@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 140
+
+Locked RFC 5869 Appendix A.2 (longer IKM, salt, info; L = 82) and Appendix A.3 (empty salt, empty info; L = 42) test vectors with SHA-256 in HkdfTests.fs. Locked HKDF.expand zero length returning empty array, maximum length 255 * 32 = 8160 octets accepted, and length 8161 refused with ParameterOutOfRange per RFC 5869 section 2.3. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 139
 
 Added HKDF module (HKDF.extract and HKDF.expand) in HKDF.fs with HMAC.hmacSha256 (built on CLR SHA-256) per RFC 5869. Defaulted empty salt to 32 zero bytes in extract, checked length limits in expand, and locked RFC 5869 Appendix A.1 test vector (IKM, salt, info, L = 42, PRK, OKM) in HkdfTests.fs. `dotnet test --configuration Release` passed.
