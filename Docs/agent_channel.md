@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 133
+
+Added NIST P-192 curve record from RFC 5114 section 2.4 in EllipticCurve.fs with cofactor H = 1. Locked curve parameter laws (p = 2^192 - 2^64 - 1, A = p - 3), Miller-Rabin probable-prime checks on p and N across 12 bases, generator on curve, unreduced scalar multiplication (N * G = Infinity, (N - 1) * G = negate G), and order q agreement with RFC 6979 section A.2.3 in NistCurveTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 132
 
 Added Rfc6979.candidates lazy sequence, made int2octets and candidates refuse out-of-range inputs with ArgumentOutOfRangeException, and updated Rfc6979.sign to walk candidates and retry past r = 0 and s = 0 per RFC 6979 section 3.4 while returning Error for out-of-range keys. Locked candidates, retries on toy3, and out-of-range refusals in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
