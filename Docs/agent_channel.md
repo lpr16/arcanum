@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 139
+
+Added HKDF module (HKDF.extract and HKDF.expand) in HKDF.fs with HMAC.hmacSha256 (built on CLR SHA-256) per RFC 5869. Defaulted empty salt to 32 zero bytes in extract, checked length limits in expand, and locked RFC 5869 Appendix A.1 test vector (IKM, salt, info, L = 42, PRK, OKM) in HkdfTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 138
 
 Locked SEC 1 point encoding and decoding on NIST P-192 and P-224 generators: compressed (03 for odd Gy on P-192, 02 for even Gy on P-224) and uncompressed (49 bytes and 57 bytes), general Tonelli-Shanks path (S = 96) in Modular.modSqrt during compressed decoding on P-224, and full round-trip preservation of leading zero bytes on the P-224 public key U in Sec1Tests.fs. `dotnet test --configuration Release` passed.

@@ -45,6 +45,7 @@
     <Compile Include="StructureTests.fs" />
     <Compile Include="NafTests.fs" />
     <Compile Include="NistCurveTests.fs" />
+    <Compile Include="HkdfTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

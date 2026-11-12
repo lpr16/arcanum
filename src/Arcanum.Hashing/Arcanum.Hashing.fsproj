@@ -13,6 +13,7 @@
     <Compile Include="SHA256.fs" />
     <Compile Include="HMAC.fs" />
     <Compile Include="PBKDF2.fs" />
+    <Compile Include="HKDF.fs" />
   </ItemGroup>
 
 </Project>
