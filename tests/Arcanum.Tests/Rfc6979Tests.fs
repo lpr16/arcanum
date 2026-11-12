@@ -285,4 +285,54 @@ module Rfc6979Tests =
         Assert.True(Ecdsa.verify curve u msgTest expectedSigTest)
         Assert.False(Ecdsa.verify curve u msgTest expectedSigSample)
 
+    [<Fact>]
+    let ``Phase 137 - RFC 6979 section A.2.4 deterministic signatures on NIST P-224 (32-bit digest truncation)`` () =
+        let curve = EllipticCurve.nistP224
+        let q = curve.N
+        let x = hexInt "F220266E1105BFE3083E03EC7A3A654651F45E37167E88600BF257C1"
+        let ux = hexInt "00CF08DA5AD719E42707FA431292DEA11244D64FC51610D94B130D6C"
+        let uy = hexInt "EEAB6F3DEBE455E3DBF85416F7030CBD94F34F2D6F232C69F3C1385A"
+        let u = EllipticCurve.Point(ux, uy)
+
+        let msgSample = Encoding.ASCII.GetBytes("sample")
+        let msgTest = Encoding.ASCII.GetBytes("test")
+
+        // Representative is the first 28 bytes of SHA256("sample"), below N
+        let expectedRepSample = hexInt "AF2BDBE1AA9B6EC1E2ADE1D694F41FC71A831D0268E9891562113D8A"
+        Assert.Equal(expectedRepSample, Ecdsa.messageRepresentative curve msgSample)
+        Assert.True(expectedRepSample < q)
+
+        // Public key derivation (Ux begins with a zero byte in 28-byte representation)
+        Assert.Equal(u, EllipticCurve.scalarMultiply curve x curve.G)
+
+        let keyPair : Ecdsa.EcdsaKeyPair = {
+            PrivateKey = x
+            PublicKey = u
+            Curve = curve
+        }
+
+        let expectedKSample = hexInt "AD3029E0278F80643DE33917CE6908C70A8FF50A411F06E41DEDFCDC"
+        let expectedSigSample : EcdsaSignature = {
+            R = hexInt "61AA3DA010E8E8406C656BC477A7A7189895E7E840CDFE8FF42307BA"
+            S = hexInt "BC814050DAB5D23770879494F9E0A680DC1AF7161991BDE692B10101"
+        }
+
+        let expectedKTest = hexInt "FF86F57924DA248D6E44E8154EB69F0AE2AEBAEE9931D0B5A969F904"
+        let expectedSigTest : EcdsaSignature = {
+            R = hexInt "AD04DDE87B84747A243A631EA47A1BA6D1FAA059149AD2440DE6FBA6"
+            S = hexInt "178D49B1AE90E3D8B629BE3DB5683915F4E8C99FDF6E666CF37ADCFD"
+        }
+
+        // Nonce generation
+        Assert.Equal(expectedKSample, Rfc6979.generateK q x msgSample)
+        Assert.Equal(expectedKTest, Rfc6979.generateK q x msgTest)
+
+        // Signatures and verification
+        Assert.Equal(Ok expectedSigSample, Rfc6979.sign keyPair msgSample)
+        Assert.Equal(Ok expectedSigTest, Rfc6979.sign keyPair msgTest)
+        Assert.True(Ecdsa.verify curve u msgSample expectedSigSample)
+        Assert.True(Ecdsa.verify curve u msgTest expectedSigTest)
+        Assert.False(Ecdsa.verify curve u msgTest expectedSigSample)
+
+
 

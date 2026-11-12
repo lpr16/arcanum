@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 137
+
+Locked RFC 6979 section A.2.4 deterministic signatures on NIST P-224 with SHA-256 (exercising 32-bit digest truncation where the 256-bit hash loses its last 32 bits to form the 224-bit representative), checking representative below N, public key derivation with leading zero byte in Ux, nonces k, deterministic signatures (r, s), and verification on "sample" and "test" in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 136
 
 Locked RFC 6979 section A.2.3 deterministic signatures on NIST P-192 with SHA-256 (exercising 64-bit digest truncation where the 256-bit hash loses its last 64 bits to form the 192-bit representative), checking representative below N, public key derivation, nonces k, deterministic signatures (r, s), and verification on "sample" and "test" in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
