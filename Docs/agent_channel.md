@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 134
+
+Added NIST P-224 curve record from RFC 5114 section 2.5 in EllipticCurve.fs with cofactor H = 1. Locked curve parameter laws (p = 2^224 - 2^96 + 1, A = p - 3), p = 1 (mod 4) with p - 1 = 2^96 * q (q odd, exercising Tonelli-Shanks general path), Miller-Rabin probable-prime checks on p and N across 12 bases, generator on curve, unreduced scalar multiplication (N * G = Infinity, (N - 1) * G = negate G), and order q agreement with RFC 6979 section A.2.4 in NistCurveTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 133
 
 Added NIST P-192 curve record from RFC 5114 section 2.4 in EllipticCurve.fs with cofactor H = 1. Locked curve parameter laws (p = 2^192 - 2^64 - 1, A = p - 3), Miller-Rabin probable-prime checks on p and N across 12 bases, generator on curve, unreduced scalar multiplication (N * G = Infinity, (N - 1) * G = negate G), and order q agreement with RFC 6979 section A.2.3 in NistCurveTests.fs. `dotnet test --configuration Release` passed.

@@ -390,6 +390,24 @@ module EllipticCurve =
             H = h
         }
 
+    /// Standard curve parameters for NIST P-224 from RFC 5114 section 2.5 (P-224 is NIST P-224).
+    let nistP224 : Curve =
+        let p = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001", Globalization.NumberStyles.HexNumber)
+        let a = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE", Globalization.NumberStyles.HexNumber)
+        let b = BigInteger.Parse("0B4050A850C04B3ABF54132565044B0B7D7BFD8BA270B39432355FFB4", Globalization.NumberStyles.HexNumber)
+        let gx = BigInteger.Parse("0B70E0CBD6BB4BF7F321390B94A03C1D356C21122343280D6115C1D21", Globalization.NumberStyles.HexNumber)
+        let gy = BigInteger.Parse("0BD376388B5F723FB4C22DFE6CD4375A05A07476444D5819985007E34", Globalization.NumberStyles.HexNumber)
+        let n = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D", Globalization.NumberStyles.HexNumber)
+        let h = BigInteger.One
+        {
+            P = p
+            A = a
+            B = b
+            G = Point(gx, gy)
+            N = n
+            H = h
+        }
+
     /// Toy curve y^2 = x^3 + 1 over F_17.
     /// This toy curve is not a secure group.
     let toy : Curve =
