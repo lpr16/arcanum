@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 130
+
+Refused failed modular inverse in EllipticCurve.add and Jacobian.toAffine by raising ArgumentException indicating non-reduced coordinates or non-prime modulus instead of returning Infinity. Locked refusal tests in ToyCurveTests.fs and JacobianTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 129
 
 Updated AGENTS.md charter to include later work orders in Docs/, toy3Twist, NIST P-192 and P-224 parameter records, citations for RFC 6979 A.2.3-A.2.5, RFC 5114 A.4-A.5, RFC 5903 8.1, RFC 9380 J.1, and RFC 9180 A.5, and HKDF, expand_message_xmd, and HPKE as constructions on HMAC.hmacSha256 and CLR SHA-256. Committed Docs/antigravity_composition_program.md. `dotnet test --configuration Release` passed.

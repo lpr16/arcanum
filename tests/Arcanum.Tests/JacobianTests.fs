@@ -1,5 +1,6 @@
 namespace Arcanum.Tests
 
+open System
 open System.Globalization
 open System.Numerics
 open Xunit
@@ -201,3 +202,12 @@ module JacobianTests =
               EllipticCurve.double EllipticCurve.toy3 EllipticCurve.toy3.G
               EllipticCurve.Infinity ]
         Assert.Equal<EllipticCurve.ECPoint list>(expectedMixed, Jacobian.batchToAffine EllipticCurve.toy3 mixed)
+
+    [<Fact>]
+    let ``Phase 130 - Jacobian toAffine raises ArgumentException on failed modular inverse`` () =
+        let compositeCurve = { EllipticCurve.toy with P = 15I }
+        let pt : Jacobian.JacobianPoint = { X = 1I; Y = 1I; Z = 3I }
+        Assert.Throws<ArgumentException>(fun () ->
+            Jacobian.toAffine compositeCurve pt |> ignore
+        ) |> ignore
+

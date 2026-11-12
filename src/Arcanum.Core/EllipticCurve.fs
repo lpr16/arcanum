@@ -89,7 +89,7 @@ module EllipticCurve =
                     let num = Modular.modPos (3I * Modular.modPow x1 2I curve.P + curve.A) curve.P
                     let denom = Modular.modPos (2I * y1) curve.P
                     match Modular.modInverse denom curve.P with
-                    | None -> Infinity
+                    | None -> raise (ArgumentException("Denominator has no modular inverse; check coordinate reduction or prime modulus."))
                     | Some invDenom ->
                         let lambda = Modular.modPos (num * invDenom) curve.P
                         let x3 = Modular.modPos (Modular.modPow lambda 2I curve.P - 2I * x1) curve.P
@@ -100,7 +100,7 @@ module EllipticCurve =
                 let num = Modular.modPos (y2 - y1) curve.P
                 let denom = Modular.modPos (x2 - x1) curve.P
                 match Modular.modInverse denom curve.P with
-                | None -> Infinity
+                | None -> raise (ArgumentException("Denominator has no modular inverse; check coordinate reduction or prime modulus."))
                 | Some invDenom ->
                     let lambda = Modular.modPos (num * invDenom) curve.P
                     let x3 = Modular.modPos (Modular.modPow lambda 2I curve.P - x1 - x2) curve.P

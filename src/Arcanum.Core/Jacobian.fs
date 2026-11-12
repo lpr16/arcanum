@@ -1,5 +1,6 @@
 namespace Arcanum.Core
 
+open System
 open System.Numerics
 
 module Jacobian =
@@ -26,7 +27,7 @@ module Jacobian =
             EllipticCurve.Infinity
         else
             match Modular.modInverse z p with
-            | None -> EllipticCurve.Infinity
+            | None -> raise (ArgumentException("Z coordinate has no modular inverse; check coordinate reduction or prime modulus."))
             | Some zInv ->
                 let zInv2 = Modular.modPos (zInv * zInv) p
                 let zInv3 = Modular.modPos (zInv2 * zInv) p

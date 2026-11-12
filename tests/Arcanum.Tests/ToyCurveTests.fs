@@ -135,3 +135,9 @@ module ToyCurveTests =
             ]
         Assert.Equal(16, toy2Points.Length)
 
+    [<Fact>]
+    let ``Phase 130 - add raises ArgumentException on failed modular inverse`` () =
+        Assert.Throws<ArgumentException>(fun () ->
+            add toy (Point(6I, 8I)) (Point(23I, 8I)) |> ignore
+        ) |> ignore
+
