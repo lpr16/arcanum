@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 142
+
+Added EcdsaDer.decode in EcdsaDer.fs implementing strict DER decoding of ECDSA signatures. Validated exact round-trip decoding of RFC 6979 section A.2.5 "sample" and "test" signatures, and locked strict refusal of non-minimal integers (extra 00), negative integers (missing 00 when MSB set), mismatched sequence length, trailing bytes, non-0x30 tags, and r = 0 in EcdsaDerTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 141
 
 Added EcdsaDer module in EcdsaDer.fs implementing DER encoding of ECDSA signatures (Ecdsa-Sig-Value SEQUENCE of two minimal non-negative INTEGERs r and s with 00 prefix when MSB is set per RFC 3279 / SEC 1 C.8). Locked exact DER byte encodings for RFC 6979 section A.2.5 NIST P-256 "sample" (72 bytes) and "test" (71 bytes) signatures in EcdsaDerTests.fs. `dotnet test --configuration Release` passed.
