@@ -187,3 +187,52 @@ module Rfc6979Tests =
 
         Assert.Equal(Ok sigSample, Rfc6979.sign keyPair msgSample)
         Assert.Equal(Ok sigTest, Rfc6979.sign keyPair msgTest)
+
+    [<Fact>]
+    let ``Phase 132 - RFC 6979 candidates, retries on r = 0 and s = 0, and out-of-range key refusal`` () =
+        let curve = EllipticCurve.toy3
+        let q = curve.N
+        let msgSample = Encoding.ASCII.GetBytes("sample")
+
+        // Refusal of private key outside 1 .. q - 1
+        Assert.Throws<ArgumentOutOfRangeException>(fun () ->
+            Rfc6979.candidates q 0I msgSample |> Seq.head |> ignore) |> ignore
+        Assert.Throws<ArgumentOutOfRangeException>(fun () ->
+            Rfc6979.candidates q 19I msgSample |> Seq.head |> ignore) |> ignore
+
+        let badKeyPair0 : Ecdsa.EcdsaKeyPair = { PrivateKey = 0I; PublicKey = curve.G; Curve = curve }
+        match Rfc6979.sign badKeyPair0 msgSample with
+        | Error (ParameterOutOfRange _) -> ()
+        | res -> Assert.Fail($"Expected ParameterOutOfRange for private key 0, got {res}")
+
+        let badKeyPair19 : Ecdsa.EcdsaKeyPair = { PrivateKey = 19I; PublicKey = curve.G; Curve = curve }
+        match Rfc6979.sign badKeyPair19 msgSample with
+        | Error (ParameterOutOfRange _) -> ()
+        | res -> Assert.Fail($"Expected ParameterOutOfRange for private key 19, got {res}")
+
+        // int2octets no longer reduces silently
+        Assert.Throws<ArgumentOutOfRangeException>(fun () ->
+            Rfc6979.int2octets q -1I |> ignore) |> ignore
+        Assert.Throws<ArgumentOutOfRangeException>(fun () ->
+            Rfc6979.int2octets q 19I |> ignore) |> ignore
+
+        // Private key 15: first 4 candidates are 7, 7, 6, 2
+        let cands15 = Rfc6979.candidates q 15I msgSample |> Seq.take 4 |> Seq.toList
+        Assert.Equal<BigInteger list>([ 7I; 7I; 6I; 2I ], cands15)
+
+        let pub15 = EllipticCurve.scalarMultiply curve 15I curve.G
+        let keyPair15 : Ecdsa.EcdsaKeyPair = { PrivateKey = 15I; PublicKey = pub15; Curve = curve }
+        let expectedSig15 : EcdsaSignature = { R = 16I; S = 15I }
+        Assert.Equal(Ok expectedSig15, Rfc6979.sign keyPair15 msgSample)
+        Assert.True(Ecdsa.verify curve pub15 msgSample expectedSig15)
+
+        // Private key 7: first candidates are 6, 5
+        let cands7 = Rfc6979.candidates q 7I msgSample |> Seq.take 2 |> Seq.toList
+        Assert.Equal<BigInteger list>([ 6I; 5I ], cands7)
+
+        let pub7 = EllipticCurve.scalarMultiply curve 7I curve.G
+        let keyPair7 : Ecdsa.EcdsaKeyPair = { PrivateKey = 7I; PublicKey = pub7; Curve = curve }
+        let expectedSig7 : EcdsaSignature = { R = 9I; S = 13I }
+        Assert.Equal(Ok expectedSig7, Rfc6979.sign keyPair7 msgSample)
+        Assert.True(Ecdsa.verify curve pub7 msgSample expectedSig7)
+

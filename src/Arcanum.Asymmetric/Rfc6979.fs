@@ -26,13 +26,14 @@ module Rfc6979 =
     /// RFC 6979 section 2.3.3 int2octets: encodes a non-negative integer less than q as
     /// big-endian octets of length rlen / 8 = ceil(qlen / 8).
     let int2octets (q: BigInteger) (value: BigInteger) : byte[] =
+        if value < BigInteger.Zero || value >= q then
+            raise (ArgumentOutOfRangeException("value", "Value must be in range [0, q-1]"))
         let rolen = rByteLength q
-        let normalized = Modular.modPos value q
         let raw =
-            if normalized = BigInteger.Zero then
+            if value = BigInteger.Zero then
                 [||]
             else
-                normalized.ToByteArray(isUnsigned = true, isBigEndian = true)
+                value.ToByteArray(isUnsigned = true, isBigEndian = true)
         let out = Array.zeroCreate<byte> rolen
         Array.blit raw 0 out (rolen - raw.Length) raw.Length
         out
@@ -43,10 +44,12 @@ module Rfc6979 =
         let z2 = Modular.modPos z1 q
         int2octets q z2
 
-    /// RFC 6979 section 3.2 deterministic nonce generation (steps a through h) with SHA-256.
+    /// RFC 6979 section 3.2 step h candidate sequence for nonces k in 1 .. q - 1.
     /// CLR boundaries: the message digest is SHA256.hash (which calls System.Security.Cryptography.SHA256.HashData),
     /// and HMAC_K is HMAC.hmacSha256 (the F# HMAC construction built on SHA256.hash).
-    let generateK (q: BigInteger) (privateKey: BigInteger) (message: byte[]) : BigInteger =
+    let candidates (q: BigInteger) (privateKey: BigInteger) (message: byte[]) : seq<BigInteger> =
+        if privateKey < BigInteger.One || privateKey >= q then
+            raise (ArgumentOutOfRangeException("privateKey", "Private key must be in 1 .. q - 1"))
         let qlen = qBitLength q
         let h1 = (SHA256.hash message).Value
         let xOctets = int2octets q privateKey
@@ -60,21 +63,37 @@ module Rfc6979 =
         k <- (HMAC.hmacSha256 (Key k) (Array.concat [ v; [| 0x01uy |]; xOctets; h1Octets ])).Value
         v <- (HMAC.hmacSha256 (Key k) v).Value
 
-        let rec loop () =
-            let mutable t = [||]
-            while 8 * t.Length < qlen do
-                v <- (HMAC.hmacSha256 (Key k) v).Value
-                t <- Array.append t v
-            let candidate = bits2int q t
-            if candidate >= BigInteger.One && candidate < q then
-                candidate
-            else
-                k <- (HMAC.hmacSha256 (Key k) (Array.append v [| 0x00uy |])).Value
-                v <- (HMAC.hmacSha256 (Key k) v).Value
-                loop ()
-        loop ()
+        seq {
+            let mutable currentV = v
+            let mutable currentK = k
+            while true do
+                let mutable t = [||]
+                while 8 * t.Length < qlen do
+                    currentV <- (HMAC.hmacSha256 (Key currentK) currentV).Value
+                    t <- Array.append t currentV
+                let candidate = bits2int q t
+                if candidate >= BigInteger.One && candidate < q then
+                    yield candidate
+                currentK <- (HMAC.hmacSha256 (Key currentK) (Array.append currentV [| 0x00uy |])).Value
+                currentV <- (HMAC.hmacSha256 (Key currentK) currentV).Value
+        }
 
-    /// Signs a message deterministically per RFC 6979 using generateK and Ecdsa.signWithNonce without low-s normalization.
+    /// RFC 6979 section 3.2 deterministic nonce generation with SHA-256.
+    /// Returns the first candidate from candidates.
+    let generateK (q: BigInteger) (privateKey: BigInteger) (message: byte[]) : BigInteger =
+        candidates q privateKey message |> Seq.head
+
+    /// Signs a message deterministically per RFC 6979 using candidates and Ecdsa.signWithNonce without low-s normalization.
+    /// Retries with subsequent candidates if r = 0 or s = 0 per RFC 6979 section 3.4.
     let sign (keyPair: Ecdsa.EcdsaKeyPair) (message: byte[]) : Result<EcdsaSignature, CryptoError> =
-        let k = generateK keyPair.Curve.N keyPair.PrivateKey message
-        Ecdsa.signWithNonce keyPair message k
+        let q = keyPair.Curve.N
+        if keyPair.PrivateKey < BigInteger.One || keyPair.PrivateKey >= q then
+            Error (ParameterOutOfRange "Private key d must be in range [1, n-1]")
+        else
+            candidates q keyPair.PrivateKey message
+            |> Seq.pick (fun k ->
+                match Ecdsa.signWithNonce keyPair message k with
+                | Ok sigVal -> Some (Ok sigVal)
+                | Error (CorruptedState _)
+                | Error (NonInvertibleElement _) -> None
+                | Error err -> Some (Error err))

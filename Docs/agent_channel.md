@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 132
+
+Added Rfc6979.candidates lazy sequence, made int2octets and candidates refuse out-of-range inputs with ArgumentOutOfRangeException, and updated Rfc6979.sign to walk candidates and retry past r = 0 and s = 0 per RFC 6979 section 3.4 while returning Error for out-of-range keys. Locked candidates, retries on toy3, and out-of-range refusals in Rfc6979Tests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 131
 
 Validated private key range in Ecdsa.sign upfront to refuse out-of-range keys without looping forever, and restricted retries to nonce-dependent errors (CorruptedState, NonInvertibleElement). Locked refusal of private keys 0 and 19 and round-trip verification of private key 5 on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
