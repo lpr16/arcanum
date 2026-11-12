@@ -346,3 +346,38 @@ module ToyEcdsaTests =
                 | None -> Assert.Fail("Expected denominator to be invertible modulo 19")
             | None -> Assert.Fail("Expected s1 to be invertible modulo 19")
         | _ -> Assert.Fail("Expected both signatures to succeed")
+
+    [<Fact>]
+    let ``Phase 131 - Ecdsa sign refuses out-of-range key upfront on toy3`` () =
+        let curve = EllipticCurve.toy3
+        let msg = Encoding.ASCII.GetBytes("sample")
+        let keyPair0: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 0I
+            PublicKey = curve.G
+            Curve = curve
+        }
+        match Ecdsa.sign keyPair0 msg with
+        | Error (ParameterOutOfRange _) -> ()
+        | res -> Assert.Fail($"Expected ParameterOutOfRange for private key 0, got {res}")
+
+        let keyPair19: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 19I
+            PublicKey = curve.G
+            Curve = curve
+        }
+        match Ecdsa.sign keyPair19 msg with
+        | Error (ParameterOutOfRange _) -> ()
+        | res -> Assert.Fail($"Expected ParameterOutOfRange for private key 19, got {res}")
+
+        let pub5 = EllipticCurve.scalarMultiply curve 5I curve.G
+        let keyPair5: Ecdsa.EcdsaKeyPair = {
+            PrivateKey = 5I
+            PublicKey = pub5
+            Curve = curve
+        }
+        match Ecdsa.sign keyPair5 msg with
+        | Ok sigVal ->
+            Assert.True(Ecdsa.verify curve pub5 msg sigVal)
+        | Error err ->
+            Assert.Fail($"Expected Ok signature for private key 5, got {err}")
+

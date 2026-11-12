@@ -61,12 +61,17 @@ module Ecdsa =
     /// Signs a message using ECDSA with a cryptographically secure random nonce.
     let sign (keyPair: EcdsaKeyPair) (message: byte[]) : Result<EcdsaSignature, CryptoError> =
         let curve = keyPair.Curve
-        let rec loop () =
-            let k = Primes.randomBigInteger BigInteger.One (curve.N - BigInteger.One)
-            match signWithNonce keyPair message k with
-            | Ok sigVal -> Ok sigVal
-            | Error _ -> loop ()
-        loop ()
+        if keyPair.PrivateKey <= BigInteger.Zero || keyPair.PrivateKey >= curve.N then
+            Error (ParameterOutOfRange "Private key d must be in range [1, n-1]")
+        else
+            let rec loop () =
+                let k = Primes.randomBigInteger BigInteger.One (curve.N - BigInteger.One)
+                match signWithNonce keyPair message k with
+                | Ok sigVal -> Ok sigVal
+                | Error (CorruptedState _)
+                | Error (NonInvertibleElement _) -> loop ()
+                | Error err -> Error err
+            loop ()
 
     /// Verifies an ECDSA signature against the public key and message.
     let verify (curve: EllipticCurve.Curve) (pubKey: EllipticCurve.ECPoint) (message: byte[]) (sigVal: EcdsaSignature) : bool =

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 131
+
+Validated private key range in Ecdsa.sign upfront to refuse out-of-range keys without looping forever, and restricted retries to nonce-dependent errors (CorruptedState, NonInvertibleElement). Locked refusal of private keys 0 and 19 and round-trip verification of private key 5 on toy3 in ToyEcdsaTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 130
 
 Refused failed modular inverse in EllipticCurve.add and Jacobian.toAffine by raising ArgumentException indicating non-reduced coordinates or non-prime modulus instead of returning Infinity. Locked refusal tests in ToyCurveTests.fs and JacobianTests.fs. `dotnet test --configuration Release` passed.
