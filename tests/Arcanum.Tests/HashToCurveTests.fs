@@ -1,6 +1,7 @@
 namespace Arcanum.Tests
 
 open System
+open System.Numerics
 open System.Text
 open Xunit
 open Arcanum.Core
@@ -50,3 +51,26 @@ module HashToCurveTests =
             let expectedBytes = Convert.FromHexString(expectedHex)
             let actual = HashToCurve.expandMessageXmd msgBytes dst lenInBytes
             Assert.Equal(Ok expectedBytes, actual)
+
+    [<Fact>]
+    let ``Phase 145 - RFC 9380 section 4 field helpers sgn0, isSquare, and inv0`` () =
+        let p = 17I
+
+        // sgn0 of 0 .. 16 is 0, 1, 0, 1, ... and sgn0 17 (-1) = 0
+        for i in 0 .. 16 do
+            Assert.Equal(i % 2, HashToCurve.sgn0 p (BigInteger i))
+        Assert.Equal(0, HashToCurve.sgn0 p -1I)
+
+        // isSquare is true exactly for 0, 1, 2, 4, 8, 9, 13, 15, 16
+        let expectedSquares = Set.ofList [ 0I; 1I; 2I; 4I; 8I; 9I; 13I; 15I; 16I ]
+        for i in 0 .. 16 do
+            let bi = BigInteger i
+            let expected = Set.contains bi expectedSquares
+            Assert.Equal(expected, HashToCurve.isSquare p bi)
+
+        // inv0 17 0 = 0, and inv0 17 x * x = 1 for every x in 1 .. 16
+        Assert.Equal(0I, HashToCurve.inv0 p 0I)
+        for i in 1 .. 16 do
+            let x = BigInteger i
+            let inv = HashToCurve.inv0 p x
+            Assert.Equal(1I, Modular.modPos (inv * x) p)

@@ -1,6 +1,7 @@
 namespace Arcanum.Asymmetric
 
 open System
+open System.Numerics
 open Arcanum.Core
 open Arcanum.Hashing
 
@@ -41,3 +42,23 @@ module HashToCurve =
                     prevB <- bi
 
                 Ok uniformBytes
+
+    /// RFC 9380 section 4.1 sgn0 for m = 1 (prime field).
+    let sgn0 (p: BigInteger) (x: BigInteger) : int =
+        int (Modular.modPos x p &&& 1I)
+
+    /// RFC 9380 section 4.2 is_square for m = 1 (prime field).
+    /// True for 0 and for every quadratic residue modulo p.
+    let isSquare (p: BigInteger) (x: BigInteger) : bool =
+        let xPos = Modular.modPos x p
+        xPos = 0I || Modular.jacobi xPos p = 1
+
+    /// RFC 9380 section 4.3 inv0 for m = 1 (prime field).
+    /// Returns 0 if x = 0 (mod p), or x^(-1) mod p otherwise.
+    let inv0 (p: BigInteger) (x: BigInteger) : BigInteger =
+        let xPos = Modular.modPos x p
+        if xPos = 0I then 0I
+        else
+            match Modular.modInverse xPos p with
+            | Some inv -> inv
+            | None -> 0I

@@ -4,6 +4,10 @@ This file is a mailbox, not a specification. `AGENTS.md` and the code win when e
 
 ## Log
 
+### 2026-11-12 - Antigravity - Phase 145
+
+Added RFC 9380 section 4 field helpers sgn0 (x mod 2 of reduced x), isSquare (using Modular.jacobi), and inv0 (0 for 0, Modular.modInverse otherwise) for prime fields (m = 1) in HashToCurve.fs. Locked sgn0 over 0 .. 16 and -1 mod 17, isSquare over the complete residue set modulo 17, and inv0 identity / zero behavior in HashToCurveTests.fs. `dotnet test --configuration Release` passed.
+
 ### 2026-11-12 - Antigravity - Phase 144
 
 Locked RFC 9380 Appendix K.1 128-byte (ell = 4 blocks) expand_message_xmd test vectors across 5 messages ("", "abc", "abcdef0123456789", "q128_" + 128 "q", "a512_" + 512 "a") with SHA-256 and DST = "QUUX-V01-CS02-with-expander-SHA256-128" in HashToCurveTests.fs. `dotnet test --configuration Release` passed.
